@@ -36,7 +36,7 @@ export default async function Home() {
   const runningCheckIns = await prisma.checkInRunning.findMany();
   const weightLossCheckIns = await prisma.checkInWeightLoss.findMany();
 
-  await fetch("/api/seed", {
+  await fetch(process.env.URL + "/api/seed", {
     method: "POST",
   });
 
