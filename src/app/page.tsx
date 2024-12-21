@@ -36,6 +36,10 @@ export default async function Home() {
   const runningCheckIns = await prisma.checkInRunning.findMany();
   const weightLossCheckIns = await prisma.checkInWeightLoss.findMany();
 
+  await fetch("/api/seed", {
+    method: "POST",
+  });
+
   const createUserTables = async () => {
     return users.map(async (user) => {
       const runningCheckInsForuser = runningCheckIns.filter(
