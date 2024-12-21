@@ -53,7 +53,7 @@ export async function POST(req: Request) {
   return new Response(JSON.stringify(checkIn), { status: 200 });
 }
 
-export async function GET(req: Request) {
+export async function GET() {
   const checkIns = await prisma.checkInRunning.findMany();
   return new Response(JSON.stringify(checkIns), { status: 200 });
 }
