@@ -60,6 +60,7 @@ export async function GET() {
 
 export async function DELETE(req: Request) {
   const { id, type } = await req.json();
+
   if (type === "running") {
     await prisma.checkInRunning.delete({
       where: {
