@@ -1,0 +1,48 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String              @id @default(cuid())
+  name              String?
+  password          String
+  challengeType     Int
+  checkInRunning    CheckInRunning[]
+  checkInWeightLoss CheckInWeightLoss[]
+}
+
+model CheckInRunning {
+  id                    String   @id @default(cuid())
+  userId                String
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  user                  User     @relation(fields: [userId], references: [id])
+  walkingMinutes        Int
+  halfMileMinutes       Int
+  mileMinutes           Int
+  checkPointMileMinutes Float?
+  feeling               Int
+}
+
+model CheckInWeightLoss {
+  id               String   @id @default(cuid())
+  userId           String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  user             User     @relation(fields: [userId], references: [id])
+  walkingMinutes   Int
+  ateLunch         Boolean
+  ateDinner        Boolean
+  ateSugar         Boolean
+  checkPointWeight Float?
+  feeling          Int
+  wentToGym        Boolean
+}
