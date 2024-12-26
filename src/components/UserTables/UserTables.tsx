@@ -7,6 +7,7 @@ import { WeeklyView } from "./WeeklyView";
 import { Button } from "../ui/button";
 import dayjs from "@/lib/dayjs-configurations";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { deleteCheckIn, getCheckIns } from "@/app/actions/checkins";
 
 export type CheckInTypeCombined = CheckInRunning & CheckInWeightLoss;
 
@@ -21,28 +22,24 @@ export function UserTables({ user }: UserTablesProps) {
   const [interval, setInterval] = useState<number>(dayjs().utc().isoWeek());
 
   const setResolutionAndInterval = (res: "week" | "month", int: number) => {
-    console.log(res, int);
     setResolution(res);
     setInterval(int);
   };
   const fetchCheckIns = useCallback(async () => {
     const resolutionParams = resolution === "week" ? "week" : "month";
 
-    await fetch(
-      `/api/checkins/?type=${type.toLowerCase()}&id=${
-        user.id
-      }&${resolutionParams}=${interval}`
-    )
-      .then((res) => res.json())
-      .then((data) => setCheckIns(data));
+    const data: CheckInTypeCombined[] = (await getCheckIns(
+      user.id,
+      type,
+      resolutionParams === "week" ? interval : undefined,
+      resolutionParams === "month" ? interval : undefined
+    )) as CheckInTypeCombined[];
+    setCheckIns(data);
   }, [interval, resolution, type, user.id]);
 
   const removeRow = async (id: string) => {
-    await fetch(`/api/checkins`, {
-      method: "DELETE",
-      body: JSON.stringify({ id, type }),
-    });
-    fetchCheckIns();
+    await deleteCheckIn(id, type);
+    // fetchCheckIns();
   };
 
   useEffect(() => {

@@ -1,10 +1,13 @@
-import { prisma } from "@/lib/prisma";
+"use server";
+
 import { UserTables } from "@/components/UserTables/UserTables";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getUsers } from "./actions/checkins";
 
 //import dayjs from 'dayjs' // ES 2015
 export default async function Home() {
-  const users = await prisma.user.findMany();
+  const users = await getUsers();
+
   // const runningCheckIns = await prisma.checkInRunning.findMany();
   // const weightLossCheckIns = await prisma.checkInWeightLoss.findMany();
 
@@ -20,10 +23,7 @@ export default async function Home() {
             ))}
           </TabsList>
           {users.map((user) => (
-            <TabsContent
-              value={user.id}
-              key={user.id}
-            >
+            <TabsContent value={user.id} key={user.id}>
               <UserTables key={user.id} user={user} />
             </TabsContent>
           ))}

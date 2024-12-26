@@ -2,6 +2,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import {
+  createOrUpdateCheckInRunning
+} from "@/app/actions/checkins";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -12,9 +15,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { ChallengeType } from "@prisma/client";
 import { useState } from "react";
 import { Calendar } from "../ui/calendar";
-import { ChallengeType } from "@prisma/client";
 
 const formSchema = z.object({
   walkingMinutes: z.number().int().positive(),
@@ -58,6 +61,17 @@ export function RunningCheckInForm({
     }).then(() => {
       setLoading(false);
       onCheckIn();
+    });
+
+    await createOrUpdateCheckInRunning({
+      userId: userId,
+      challengeType: "RUNNING",
+      walkingMinutes: values.walkingMinutes,
+      km: values.km,
+      minutes: values.minutes,
+      createdAt: values.createdAt,
+      updatedAt: new Date(),
+      checkPointMileMinutes: null,
     });
   }
 

@@ -27,7 +27,7 @@ export const getFeelingClass = (value: number) => {
 export const getAttributesTypes = (attribute: unknown) => {
   {
     if (attribute instanceof Date) {
-      return (attribute as Date).toLocaleDateString("YYYY-MM-DD");
+      return dayjs.utc(attribute).format("YYYY-MM-DD");
     } else if (typeof attribute === "boolean") {
       return getBooleanValueYesOrNo(attribute);
     } else if (typeof attribute === "number") {
