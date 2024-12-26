@@ -51,7 +51,7 @@ export function WeeklyView({ user, checkIn, removeRow }: WeeklyViewProps) {
           ))}
         </TableRow>
       </TableHeader>
-      <TableBody className="min-w-48">
+      <TableBody className="min-w-48 w-full">
         {checkIn?.map((checkIn, i) => (
           <TableRow
             key={i}

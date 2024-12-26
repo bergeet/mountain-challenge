@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import dayjs from "./dayjs-configurations";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -26,13 +27,39 @@ export const getFeelingClass = (value: number) => {
 export const getAttributesTypes = (attribute: unknown) => {
   {
     if (attribute instanceof Date) {
-      return (attribute as Date).toLocaleDateString("sv-SE");
+      return (attribute as Date).toLocaleDateString("YYYY-MM-DD");
     } else if (typeof attribute === "boolean") {
       return getBooleanValueYesOrNo(attribute);
     } else if (typeof attribute === "number") {
       return Number(attribute).toString();
     } else if (typeof attribute === "string") {
+      if (new Date(attribute).toString() !== "Invalid Date") {
+        return new Date(attribute).toLocaleDateString("sv-SE");
+      }
       return attribute;
     } else return null;
   }
 };
+
+export function getDatesOfWeek(year: number, weekNumber: number) {
+  const startOfWeek = dayjs()
+    .utc()
+    .year(year)
+    .isoWeek(weekNumber)
+    .startOf("isoWeek");
+  const endOfWeek = startOfWeek.endOf("isoWeek");
+
+  return [startOfWeek, endOfWeek];
+}
+
+export function getDatesOfMonth(year: number, month: number) {
+  // Month in dayjs is 0-indexed, so we subtract 1
+  const startOfMonth = dayjs()
+    .utc()
+    .year(year)
+    .month(month - 1)
+    .startOf("month");
+  const endOfMonth = startOfMonth.endOf("month");
+
+  return [startOfMonth, endOfMonth];
+}
