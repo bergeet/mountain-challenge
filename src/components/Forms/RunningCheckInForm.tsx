@@ -1,5 +1,3 @@
-"use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -8,54 +6,83 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { Calendar } from "../ui/calendar";
+import { ChallengeType } from "@prisma/client";
 
 const formSchema = z.object({
   walkingMinutes: z.number().int().positive(),
-  halfMileMinutes: z.number().int().positive(),
-  mileMinutes: z.number().int().positive(),
-  feeling: z.number().int().positive().min(1).max(5),
+  minutes: z.number().int().positive(),
+  km: z.number().int().positive(),
+  createdAt: z.date(),
 });
 
-export function RunningCheckInForm() {
+interface RunningCheckInFormProps {
+  onCheckIn: () => void;
+  userId: string;
+}
+
+export function RunningCheckInForm({
+  onCheckIn,
+  userId,
+}: RunningCheckInFormProps) {
+  const [loading, setLoading] = useState(false);
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       walkingMinutes: 0,
-      halfMileMinutes: 0,
-      mileMinutes: 0,
-      feeling: 1,
+      minutes: 0,
+      km: 0,
+      createdAt: new Date(),
     },
   });
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
-    fetch("/api/checkIns", {
+    setLoading(true);
+    fetch("/api/checkins", {
       method: "POST",
       body: JSON.stringify({
         ...values,
-        type: "running",
-        name: "Elliot",
+        userId: userId,
+        challengeType: ChallengeType.RUNNING,
+        createdAt: values.createdAt.toLocaleDateString("sv-SE"),
       }),
+    }).then(() => {
+      setLoading(false);
+      onCheckIn();
     });
   }
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-8 w-[600px]"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
+        <FormField
+          control={form.control}
+          name="createdAt"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Datum</FormLabel>
+              <FormControl>
+                <Calendar
+                  {...field}
+                  selected={field.value}
+                  mode="single"
+                  onSelect={(v) => field.onChange(v)}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={form.control}
           name="walkingMinutes"
@@ -64,9 +91,15 @@ export function RunningCheckInForm() {
               <FormLabel>Promenad (min)</FormLabel>
               <FormControl>
                 <Input
-                  type="number"
                   {...field}
-                  onChange={(v) => field.onChange(parseFloat(v.target.value))}
+                  onChange={(v) =>
+                    field.onChange(
+                      v.target.value.trim() === "" ||
+                        isNaN(Number(v.target.value))
+                        ? ""
+                        : parseFloat(v.target.value)
+                    )
+                  }
                 />
               </FormControl>
               <FormMessage />
@@ -75,15 +108,21 @@ export function RunningCheckInForm() {
         />
         <FormField
           control={form.control}
-          name="halfMileMinutes"
+          name="minutes"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>5 km (min)</FormLabel>
+              <FormLabel>Löptid i min</FormLabel>
               <FormControl>
                 <Input
-                  type="number"
                   {...field}
-                  onChange={(v) => field.onChange(parseFloat(v.target.value))}
+                  onChange={(v) =>
+                    field.onChange(
+                      v.target.value.trim() === "" ||
+                        isNaN(Number(v.target.value))
+                        ? ""
+                        : parseFloat(v.target.value)
+                    )
+                  }
                 />
               </FormControl>
               <FormMessage />
@@ -92,40 +131,31 @@ export function RunningCheckInForm() {
         />
         <FormField
           control={form.control}
-          name="mileMinutes"
+          name="km"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>10 km (min)</FormLabel>
+              <FormLabel>Längd in km</FormLabel>
               <FormControl>
                 <Input
-                  type="number"
                   {...field}
-                  onChange={(v) => field.onChange(parseFloat(v.target.value))}
+                  onChange={(v) =>
+                    field.onChange(
+                      v.target.value.trim() === "" ||
+                        isNaN(Number(v.target.value))
+                        ? ""
+                        : parseFloat(v.target.value)
+                    )
+                  }
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="feeling"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Känsla</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  onChange={(v) => field.onChange(parseFloat(v.target.value))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormDescription>Hur kände du dig under passet?</FormDescription>
 
-        <Button type="submit">Submit</Button>
+        <Button loading={loading} type="submit">
+          Submit
+        </Button>
       </form>
     </Form>
   );

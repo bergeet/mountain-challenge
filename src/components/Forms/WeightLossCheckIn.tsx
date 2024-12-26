@@ -1,5 +1,3 @@
-"use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -9,13 +7,15 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { ChallengeType } from "@prisma/client";
+import { Calendar } from "../ui/calendar";
 
 const formSchema = z.object({
   walkingMinutes: z.number().int().positive(),
@@ -23,10 +23,19 @@ const formSchema = z.object({
   ateDinner: z.boolean(),
   ateSugar: z.boolean(),
   wentToGym: z.boolean(),
-  feeling: z.number().int().positive().min(1).max(5),
+  createdAt: z.date(),
 });
 
-export function WeightLossCheckIn() {
+interface WeightLossCheckInProps {
+  onCheckIn: () => void;
+  userId: string;
+}
+
+export function WeightLossCheckIn({
+  onCheckIn,
+  userId,
+}: WeightLossCheckInProps) {
+  const [loading, setLoading] = useState(false);
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -36,7 +45,7 @@ export function WeightLossCheckIn() {
       ateDinner: false,
       ateSugar: false,
       wentToGym: false,
-      feeling: 1,
+      createdAt: new Date(),
     },
   });
 
@@ -44,22 +53,49 @@ export function WeightLossCheckIn() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    fetch("/api/checkIns", {
+    setLoading(true);
+    console.log(values);
+    fetch(`/api/checkins`, {
       method: "POST",
       body: JSON.stringify({
         ...values,
-        type: "weightLoss",
-        name: "Liam",
+        userId: userId,
+        challengeType: ChallengeType.WEIGHTLOSS,
+        createdAt: values.createdAt.toLocaleDateString("sv-SE"),
       }),
-    });
+    })
+      .then(() => {
+        setLoading(false);
+        onCheckIn();
+      })
+      .catch((e) => {
+        console.error(e);
+        setLoading(false);
+      });
   }
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-8 w-[600px]"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 w-full">
+        <FormField
+          control={form.control}
+          name="createdAt"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Datum</FormLabel>
+              <FormControl>
+                <Calendar
+                  {...field}
+                  selected={field.value}
+                  mode="single"
+                  onSelect={(v) => field.onChange(v)}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={form.control}
           name="walkingMinutes"
@@ -68,10 +104,16 @@ export function WeightLossCheckIn() {
               <FormLabel>Promenad (min)</FormLabel>
               <FormControl>
                 <Input
-                  type="number"
                   {...field}
                   className="ml-2"
-                  onChange={(v) => field.onChange(parseFloat(v.target.value))}
+                  onChange={(v) =>
+                    field.onChange(
+                      v.target.value.trim() === "" ||
+                        isNaN(Number(v.target.value))
+                        ? ""
+                        : parseFloat(v.target.value)
+                    )
+                  }
                 />
               </FormControl>
               <FormMessage />
@@ -147,25 +189,9 @@ export function WeightLossCheckIn() {
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="feeling"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Känsla</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  onChange={(v) => field.onChange(parseFloat(v.target.value))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormDescription>Hur kände du dig under passet?</FormDescription>
-
-        <Button type="submit">Submit</Button>
+        <Button loading={loading} type="submit">
+          Submit
+        </Button>
       </form>
     </Form>
   );

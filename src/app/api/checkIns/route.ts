@@ -1,22 +1,37 @@
+import { CheckInTypeCombined } from "@/components/UserTables/UserTables";
 import { prisma } from "@/lib/prisma";
+import { ChallengeType } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 export async function POST(req: Request) {
   const {
     walkingMinutes,
-    halfMileMinutes,
-    mileMinutes,
-    feeling,
-    type,
     ateDinner,
     ateLunch,
     ateSugar,
     wentToGym,
-    name,
-  } = await req.json();
+    challengeType,
+    userId,
+    km,
+    minutes,
+    createdAt,
+  }: CheckInTypeCombined & { userId: string } = await req.json();
+
+  console.log({
+    walkingMinutes,
+    ateDinner,
+    ateLunch,
+    ateSugar,
+    wentToGym,
+    challengeType,
+    userId,
+    km,
+    minutes,
+    createdAt,
+  });
   const user = await prisma.user.findFirst({
     where: {
-      name: name,
+      id: userId,
     },
   });
   if (!user) {
@@ -24,50 +39,76 @@ export async function POST(req: Request) {
   }
 
   let checkIn;
-  if (type === "running") {
-    checkIn = await prisma.checkInRunning.create({
-      data: {
-        createdAt: new Date(),
+  if (challengeType === ChallengeType.RUNNING) {
+    const chosenDate = new Date(createdAt);
+
+    checkIn = await prisma.checkInRunning.upsert({
+      where: {
+        userId_createdAt: {
+          userId: user.id,
+          createdAt: chosenDate,
+        },
+      },
+      update: {
+        walkingMinutes,
+        km,
+        minutes,
+        challengeType,
+      },
+      create: {
+        createdAt: chosenDate,
         user: { connect: { id: user.id } },
         walkingMinutes,
-        halfMileMinutes,
-        mileMinutes,
-        feeling,
+        km,
+        minutes,
+        challengeType,
       },
     });
-  } else {
-    checkIn = await prisma.checkInWeightLoss.create({
-      data: {
-        createdAt: new Date(),
+  } else if (challengeType === ChallengeType.WEIGHTLOSS) {
+    const chosenDate = new Date(createdAt);
+    checkIn = await prisma.checkInWeightLoss.upsert({
+      where: {
+        userId_createdAt: {
+          userId: user.id,
+          createdAt: chosenDate,
+        },
+      },
+      update: {
+        walkingMinutes,
+        ateDinner,
+        ateLunch,
+        ateSugar,
+        wentToGym,
+        challengeType,
+      },
+      create: {
+        createdAt: chosenDate,
         user: { connect: { id: user.id } },
         walkingMinutes,
         ateDinner,
         ateLunch,
         ateSugar,
-        feeling,
         wentToGym,
+        challengeType,
       },
     });
   }
   revalidatePath("/");
-  return new Response(JSON.stringify(checkIn), { status: 200 });
-}
+  revalidatePath("/api/checkIns");
 
-export async function GET() {
-  const checkIns = await prisma.checkInRunning.findMany();
-  return new Response(JSON.stringify(checkIns), { status: 200 });
+  return new Response(JSON.stringify(checkIn), { status: 200 });
 }
 
 export async function DELETE(req: Request) {
   const { id, type } = await req.json();
 
-  if (type === "running") {
+  if (type === ChallengeType.RUNNING) {
     await prisma.checkInRunning.delete({
       where: {
         id,
       },
     });
-  } else {
+  } else if (type === ChallengeType.WEIGHTLOSS) {
     await prisma.checkInWeightLoss.delete({
       where: {
         id,
@@ -76,5 +117,6 @@ export async function DELETE(req: Request) {
   }
 
   revalidatePath("/");
+  revalidatePath("/api/checkIns");
   return new Response("Deleted", { status: 200 });
 }

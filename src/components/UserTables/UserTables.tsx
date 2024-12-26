@@ -1,139 +1,52 @@
-import { DeleteCheckInButton } from "../DeleteCheckIn/DeleteCheckInButton";
-import {
-  TableCaption,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-  Table,
-} from "../ui/table";
-import {
-  getValidityClass,
-  getFeelingClass,
-  getBooleanValueYesOrNo,
-} from "@/lib/utils";
+"use client";
+
 import { CheckInRunning, CheckInWeightLoss, User } from "@prisma/client";
+import { useCallback, useEffect, useState } from "react";
+import { CheckIn } from "../CheckIn/CheckIn";
+import { WeeklyView } from "./WeeklyView";
+
+export type CheckInTypeCombined = CheckInRunning & CheckInWeightLoss;
 
 interface UserTablesProps {
-  users: User[];
-  runningCheckIns: CheckInRunning[];
-  weightLossCheckIns: CheckInWeightLoss[];
+  user: User;
 }
 
-export function UserTables({
-  users,
-  runningCheckIns,
-  weightLossCheckIns,
-}: UserTablesProps) {
-  const createUserTables = async () => {
-    return users.map(async (user) => {
-      const runningCheckInsForuser = runningCheckIns.filter(
-        (checkIn) => checkIn.userId === user.id
-      );
-      const weightLossCheckInsForUser = weightLossCheckIns.filter(
-        (checkIn) => checkIn.userId === user.id
-      );
+export function UserTables({ user }: UserTablesProps) {
+  const type = user.challengeType;
+  const [checkins, setCheckIns] = useState<CheckInTypeCombined[] | null>(null);
 
-      return (
-        <Table key={user.id} className="w-full border border-gray-200">
-          <TableCaption>{user.name}</TableCaption>
-          <TableHeader>
-            {runningCheckInsForuser?.length > 0 ? (
-              <TableRow>
-                <TableHead className="w-[100px]">Skapades</TableHead>
-                <TableHead className="w-[100px]">Tid 5 km</TableHead>
-                <TableHead className="w-[100px]">Tid 10 km</TableHead>
-                <TableHead className="w-[100px]">Tid promenad</TableHead>
-                <TableHead className="w-[100px]">Känsla</TableHead>
-              </TableRow>
-            ) : weightLossCheckInsForUser?.length > 0 ? (
-              <TableRow>
-                <TableHead className="w-[100px]">Skapades</TableHead>
-                <TableHead className="w-[100px]">Åt lunch</TableHead>
-                <TableHead className="w-[100px]">Åt middag</TableHead>
-                <TableHead className="w-[100px]">Åt socker</TableHead>
-                <TableHead className="w-[100px]">Tid promenad</TableHead>
-                <TableHead className="w-[100px]">Känsla</TableHead>
-              </TableRow>
-            ) : null}
-          </TableHeader>
-          <TableBody>
-            {runningCheckInsForuser?.length > 0
-              ? runningCheckInsForuser.map(async (checkIn) => (
-                  <TableRow key={checkIn.id}>
-                    <TableCell>
-                      {checkIn.createdAt.toLocaleDateString()}
-                    </TableCell>
-                    <TableCell
-                      className={`w-[100px] ${getValidityClass(
-                        !!checkIn.halfMileMinutes
-                      )}`}
-                    >
-                      {checkIn.halfMileMinutes}
-                    </TableCell>
-                    <TableCell
-                      className={`w-[100px] ${getValidityClass(
-                        !!checkIn.mileMinutes
-                      )}`}
-                    >
-                      {checkIn.mileMinutes}
-                    </TableCell>
-                    <TableCell
-                      className={`w-[100px] ${getValidityClass(
-                        !!checkIn.walkingMinutes
-                      )}`}
-                    >
-                      {checkIn.walkingMinutes}
-                    </TableCell>
-                    <TableCell className={getFeelingClass(checkIn.feeling)}>
-                      {checkIn.feeling}
-                    </TableCell>
-                    <TableCell className="flex justify-center">
-                      <DeleteCheckInButton
-                        checkInId={checkIn.id}
-                        type="running"
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))
-              : weightLossCheckInsForUser?.length > 0
-              ? weightLossCheckInsForUser.map((checkIn) => (
-                  <TableRow key={checkIn.id}>
-                    <TableCell>
-                      {checkIn.createdAt.toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      {getBooleanValueYesOrNo(checkIn.ateLunch)}
-                    </TableCell>
-                    <TableCell>
-                      {getBooleanValueYesOrNo(checkIn.ateDinner)}
-                    </TableCell>
-                    <TableCell
-                      className={`w-[100px] ${getValidityClass(
-                        !checkIn.ateSugar
-                      )}`}
-                    >
-                      {getBooleanValueYesOrNo(checkIn.ateSugar)}
-                    </TableCell>
-                    <TableCell>{checkIn.walkingMinutes}</TableCell>
-                    <TableCell className={getFeelingClass(checkIn.feeling)}>
-                      {checkIn.feeling}
-                    </TableCell>
-                    <TableCell className="flex justify-center">
-                      <DeleteCheckInButton
-                        checkInId={checkIn.id}
-                        type="weightLoss"
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))
-              : null}
-          </TableBody>
-        </Table>
-      );
+  const fetchCheckIns = useCallback(async () => {
+    const res = await fetch(
+      `/api/checkins/${type.toLowerCase()}?id=${user.id}`
+    );
+    const data = await res.json();
+
+    setCheckIns(data);
+  }, [type, user.id]);
+
+  const removeRow = async (id: string) => {
+    await fetch(`/api/checkins`, {
+      method: "DELETE",
+      body: JSON.stringify({ id, type }),
     });
+    fetchCheckIns();
   };
 
-  return <div className="w-full">{createUserTables()}</div>;
+  useEffect(() => {
+    fetchCheckIns();
+  }, [fetchCheckIns, type, user.id, user.name]);
+
+  const createUserTables = () => {
+    return (
+      <div key={user.id} className="mb-8 flex flex-col gap-4 items-start">
+        <h2 className="text-2xl font-bold">{user.name}</h2>
+
+        <CheckIn onCheckIn={fetchCheckIns} user={user} />
+
+        <WeeklyView user={user} checkIn={checkins} removeRow={removeRow} />
+      </div>
+    );
+  };
+
+  return <div className="w-full flex-col gap-8">{createUserTables()}</div>;
 }

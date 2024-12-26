@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 export const getBooleanValueYesOrNo = (value: boolean) =>
   value ? "Ja" : "Nej";
 export const getValidityClass = (value: boolean) =>
-  value ? "bg-green-500" : "bg-red-500";
+  value ? "bg-green-200" : "bg-red-200";
 export const getFeelingClass = (value: number) => {
   switch (value) {
     case 1:
@@ -20,5 +20,19 @@ export const getFeelingClass = (value: number) => {
       return "bg-green-500";
     case 5:
       return "bg-blue-500";
+  }
+};
+
+export const getAttributesTypes = (attribute: unknown) => {
+  {
+    if (attribute instanceof Date) {
+      return (attribute as Date).toLocaleDateString("sv-SE");
+    } else if (typeof attribute === "boolean") {
+      return getBooleanValueYesOrNo(attribute);
+    } else if (typeof attribute === "number") {
+      return Number(attribute).toString();
+    } else if (typeof attribute === "string") {
+      return attribute;
+    } else return null;
   }
 };

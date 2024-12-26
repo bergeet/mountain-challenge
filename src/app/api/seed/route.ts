@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { ChallengeType } from "@prisma/client";
 
 export async function POST() {
   const elliot = await prisma.user.findFirst({
@@ -11,7 +12,7 @@ export async function POST() {
       data: {
         name: "Elliot",
         password: "password",
-        challengeType: 1,
+        challengeType: ChallengeType.RUNNING,
       },
     });
   }
@@ -26,7 +27,7 @@ export async function POST() {
       data: {
         name: "Liam",
         password: "password",
-        challengeType: 2,
+        challengeType: ChallengeType.WEIGHTLOSS,
       },
     });
   }

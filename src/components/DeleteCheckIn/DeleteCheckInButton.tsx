@@ -10,7 +10,7 @@ export function DeleteCheckInButton({
   type: "running" | "weightLoss";
 }) {
   const deleteCheckIn = async (id: string) => {
-    await fetch("/api/checkIns", {
+    await fetch("/api/checkins", {
       method: "DELETE",
       body: JSON.stringify({
         id,

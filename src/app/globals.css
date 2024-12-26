@@ -70,3 +70,9 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.rdp-root {
+  --rdp-day_button-border: 10px solid var(--border);
+  --rdp-today-color: red;
+  --rdp-today-color: red;
+}
