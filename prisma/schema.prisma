@@ -29,6 +29,7 @@ model User {
   Challenge         Challenge?          @relation(fields: [challengeId], references: [id])
   challengeId       String?
   UserDetails       UserDetails[]
+  Achievement       Achievement[]
 }
 
 model CheckInRunning {
@@ -80,4 +81,26 @@ model UserDetails {
   fiveKmTime Float
   tenKmTime  Float
   weight     Float
+}
+
+model AchievementType {
+  id          String        @id @default(cuid())
+  name        String
+  description String
+  points      Int
+  Achievement Achievement[]
+}
+
+model Achievement {
+  id                String          @id @default(cuid())
+  userId            String
+  createdAt         DateTime        @default(dbgenerated("CURRENT_DATE")) @db.Date
+  updatedAt         DateTime        @updatedAt
+  user              User            @relation(fields: [userId], references: [id])
+  achievementType   AchievementType @relation(fields: [achievementTypeId], references: [id])
+  achievementTypeId String
+  points            Int
+  challengeType     ChallengeType
+
+  @@unique([userId, createdAt])
 }

@@ -197,17 +197,6 @@ export async function getCheckIns(
   intervalFrom: string,
   intervalTo: string
 ) {
-  //   let fromDate;
-  //   let toDate;
-  //   if (week && !month) {
-  //     const dates = getDatesOfWeek(new Date().getFullYear(), week);
-  //     fromDate = dates[0];
-  //     toDate = dates[1];
-  //   } else if (month && !week) {
-  //     const dates = getDatesOfMonth(new Date().getFullYear(), month);
-  //     fromDate = dates[0];
-  //     toDate = dates[1];
-  //   }
   if (type === ChallengeType.RUNNING) {
     return await prisma.checkInRunning.findMany({
       where: {
