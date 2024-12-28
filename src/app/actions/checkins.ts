@@ -1,13 +1,11 @@
 "use server";
 
-import {
-    CheckInTypeCombined
-} from "@/components/UserTables/UserTables";
+import { CheckInTypeCombined } from "@/components/UserTables/UserTables";
 import { prisma } from "@/lib/prisma";
 import {
-    ChallengeType,
-    CheckInRunning,
-    CheckInWeightLoss,
+  ChallengeType,
+  CheckInRunning,
+  CheckInWeightLoss,
 } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 

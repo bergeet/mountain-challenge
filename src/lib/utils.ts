@@ -27,14 +27,14 @@ export const getFeelingClass = (value: number) => {
 export const getAttributesTypes = (attribute: unknown) => {
   {
     if (attribute instanceof Date) {
-      return dayjs.utc(attribute).format("YYYY-MM-DD");
+      return dayjs(attribute).format("YYYY-MM-DD");
     } else if (typeof attribute === "boolean") {
       return getBooleanValueYesOrNo(attribute);
     } else if (typeof attribute === "number") {
       return Number(attribute).toString();
     } else if (typeof attribute === "string") {
       if (new Date(attribute).toString() !== "Invalid Date") {
-        return new Date(attribute).toLocaleDateString("sv-SE");
+        return dayjs.utc(attribute).format("YYYY-MM-DD");
       }
       return attribute;
     } else return null;
