@@ -8,6 +8,7 @@ import { Button } from "../ui/button";
 import dayjs from "@/lib/dayjs-configurations";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { deleteCheckIn, getCheckIns } from "@/app/actions/checkins";
+import { Dayjs } from "dayjs";
 
 export type CheckInTypeCombined = CheckInRunning & CheckInWeightLoss;
 
@@ -15,27 +16,46 @@ interface UserTablesProps {
   user: User;
 }
 
+export interface DateInterval {
+  startDate: Dayjs;
+  endDate: Dayjs;
+}
+
 export function UserTables({ user }: UserTablesProps) {
   const type = user.challengeType;
   const [checkins, setCheckIns] = useState<CheckInTypeCombined[] | null>(null);
-  const [resolution, setResolution] = useState<"week" | "month">("week");
+  const [resolution, setResolution] = useState<"isoWeek" | "month">("isoWeek");
   const [interval, setInterval] = useState<number>(dayjs().utc().isoWeek());
+  const [intervalDates, setIntervalDates] = useState<DateInterval>({
+    startDate: dayjs().utc().startOf("isoWeek"),
+    endDate: dayjs().utc().endOf("isoWeek"),
+  });
 
-  const setResolutionAndInterval = (res: "week" | "month", int: number) => {
+  const setResolutionAndInterval = (res: "isoWeek" | "month") => {
     setResolution(res);
-    setInterval(int);
+    if (res === "isoWeek") {
+      setInterval(dayjs().utc().isoWeek());
+      setIntervalDates({
+        startDate: dayjs().utc().startOf("isoWeek"),
+        endDate: dayjs().utc().endOf("isoWeek"),
+      });
+    } else {
+      setInterval(dayjs().utc().month());
+      setIntervalDates({
+        startDate: dayjs().utc().startOf("month"),
+        endDate: dayjs().utc().endOf("month"),
+      });
+    }
   };
   const fetchCheckIns = useCallback(async () => {
-    const resolutionParams = resolution === "week" ? "week" : "month";
-
     const data: CheckInTypeCombined[] = (await getCheckIns(
       user.id,
       type,
-      resolutionParams === "week" ? interval : undefined,
-      resolutionParams === "month" ? interval : undefined
+      intervalDates.startDate.toISOString(),
+      intervalDates.endDate.toISOString()
     )) as CheckInTypeCombined[];
     setCheckIns(data);
-  }, [interval, resolution, type, user.id]);
+  }, [intervalDates, type, user.id]);
 
   const removeRow = async (id: string) => {
     await deleteCheckIn(id, type);
@@ -44,7 +64,7 @@ export function UserTables({ user }: UserTablesProps) {
 
   useEffect(() => {
     fetchCheckIns();
-  }, [fetchCheckIns, type, user.id, user.name]);
+  }, [fetchCheckIns]);
 
   const createUserTables = () => {
     return (
@@ -54,40 +74,48 @@ export function UserTables({ user }: UserTablesProps) {
         <CheckIn onCheckIn={fetchCheckIns} user={user} />
         <div className="flex flex-row gap-4 justify-between items-center w-full">
           <div className="gap-4 flex flex-row">
-            <Button
-              onClick={() =>
-                setResolutionAndInterval("week", dayjs().utc().isoWeek())
-              }
-            >
+            <Button onClick={() => setResolutionAndInterval("isoWeek")}>
               Vecka
             </Button>
-            <Button
-              onClick={() =>
-                setResolutionAndInterval("month", dayjs().utc().month() + 1)
-              }
-            >
+            <Button onClick={() => setResolutionAndInterval("month")}>
               Månad
             </Button>
           </div>
-          <div className="flex flex-row gap-4">
+          <div className="flex flex-row gap-4 font-bold">
             <ChevronLeft
               className="cursor-pointer hover:rounded-lg hover:border-gray-700 border-transparent border-2 pd-2 hover:border-current"
               onClick={() => {
-                if (resolution === "week") {
-                  setInterval(interval - 1);
+                if (resolution === "isoWeek") {
+                  setIntervalDates({
+                    startDate: intervalDates.startDate.subtract(1, "week"),
+                    endDate: intervalDates.endDate.subtract(1, "week"),
+                  });
                 } else {
-                  setInterval(interval - 1);
+                  setIntervalDates({
+                    startDate: intervalDates.startDate.subtract(1, "month"),
+                    endDate: intervalDates.endDate.subtract(1, "month"),
+                  });
                 }
               }}
             />
-            {interval}
+            {resolution === "isoWeek"
+              ? intervalDates.startDate.isoWeek()
+              : intervalDates.startDate.toDate().toLocaleString("default", {
+                  month: "long",
+                })}
             <ChevronRight
               className="cursor-pointer hover:rounded-lg hover:border-gray-700 border-transparent border-2 pd-2 hover:border-current"
               onClick={() => {
-                if (resolution === "week") {
-                  setInterval(interval + 1);
+                if (resolution === "isoWeek") {
+                  setIntervalDates({
+                    startDate: intervalDates.startDate.add(1, "week"),
+                    endDate: intervalDates.endDate.add(1, "week"),
+                  });
                 } else {
-                  setInterval(interval + 1);
+                  setIntervalDates({
+                    startDate: intervalDates.startDate.add(1, "month"),
+                    endDate: intervalDates.endDate.add(1, "month"),
+                  });
                 }
               }}
             />

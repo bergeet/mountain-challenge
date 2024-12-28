@@ -1,6 +1,9 @@
 "use server";
 
-import { CheckInTypeCombined } from "@/components/UserTables/UserTables";
+import {
+  CheckInTypeCombined,
+  DateInterval,
+} from "@/components/UserTables/UserTables";
 import { prisma } from "@/lib/prisma";
 import { getDatesOfMonth, getDatesOfWeek } from "@/lib/utils";
 import {
@@ -193,33 +196,39 @@ export async function deleteCheckIn(id: string, type: ChallengeType) {
 export async function getCheckIns(
   id: string,
   type: string,
-  week?: number,
-  month?: number
+  intervalFrom: string,
+  intervalTo: string
 ) {
-  let fromDate;
-  let toDate;
-  if (week && !month) {
-    const dates = getDatesOfWeek(new Date().getFullYear(), week);
-    fromDate = dates[0];
-    toDate = dates[1];
-  } else if (month && !week) {
-    const dates = getDatesOfMonth(new Date().getFullYear(), month);
-    fromDate = dates[0];
-    toDate = dates[1];
-  }
+  //   let fromDate;
+  //   let toDate;
+  //   if (week && !month) {
+  //     const dates = getDatesOfWeek(new Date().getFullYear(), week);
+  //     fromDate = dates[0];
+  //     toDate = dates[1];
+  //   } else if (month && !week) {
+  //     const dates = getDatesOfMonth(new Date().getFullYear(), month);
+  //     fromDate = dates[0];
+  //     toDate = dates[1];
+  //   }
   if (type === ChallengeType.RUNNING) {
     return await prisma.checkInRunning.findMany({
       where: {
         userId: id,
         createdAt: {
-          gte: fromDate?.toDate(),
-          lte: toDate?.toDate(),
+          gte: intervalFrom,
+          lte: intervalTo,
         },
       },
     });
   } else if (type === ChallengeType.WEIGHTLOSS) {
     return await prisma.checkInWeightLoss.findMany({
-      where: { userId: id },
+      where: {
+        userId: id,
+        createdAt: {
+          gte: intervalFrom,
+          lte: intervalTo,
+        },
+      },
     });
   }
 
