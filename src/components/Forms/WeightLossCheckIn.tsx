@@ -19,7 +19,7 @@ import { useState } from "react";
 import { Calendar } from "../ui/calendar";
 
 const formSchema = z.object({
-  walkingMinutes: z.number().int().min(0).optional(),
+  walkingMinutes: z.number().int().min(0).optional().default(0),
   ateLunch: z.boolean(),
   ateDinner: z.boolean(),
   ateSugar: z.boolean(),
