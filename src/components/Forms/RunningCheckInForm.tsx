@@ -13,7 +13,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { ChallengeType } from "@prisma/client";
 import { useState } from "react";
 import { Calendar } from "../ui/calendar";
 

@@ -1,8 +1,9 @@
+import { Checkbox } from "@/components/ui/checkbox";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Checkbox } from "@/components/ui/checkbox";
 
+import { createOrUpdateCheckInWeightLoss } from "@/app/actions/checkins";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -13,11 +14,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
 import { ChallengeType } from "@prisma/client";
+import { useState } from "react";
 import { Calendar } from "../ui/calendar";
-import { createOrUpdateCheckInWeightLoss } from "@/app/actions/checkins";
-import { Dayjs } from "dayjs";
 
 const formSchema = z.object({
   walkingMinutes: z.number().int().positive(),

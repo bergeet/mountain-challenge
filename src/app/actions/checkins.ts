@@ -1,15 +1,13 @@
 "use server";
 
 import {
-  CheckInTypeCombined,
-  DateInterval,
+    CheckInTypeCombined
 } from "@/components/UserTables/UserTables";
 import { prisma } from "@/lib/prisma";
-import { getDatesOfMonth, getDatesOfWeek } from "@/lib/utils";
 import {
-  ChallengeType,
-  CheckInRunning,
-  CheckInWeightLoss,
+    ChallengeType,
+    CheckInRunning,
+    CheckInWeightLoss,
 } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 

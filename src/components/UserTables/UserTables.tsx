@@ -1,14 +1,14 @@
 "use client";
 
+import { deleteCheckIn, getCheckIns } from "@/app/actions/checkins";
+import dayjs from "@/lib/dayjs-configurations";
 import { CheckInRunning, CheckInWeightLoss, User } from "@prisma/client";
+import { Dayjs } from "dayjs";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { CheckIn } from "../CheckIn/CheckIn";
-import { WeeklyView } from "./WeeklyView";
 import { Button } from "../ui/button";
-import dayjs from "@/lib/dayjs-configurations";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { deleteCheckIn, getCheckIns } from "@/app/actions/checkins";
-import { Dayjs } from "dayjs";
+import { WeeklyView } from "./WeeklyView";
 
 export type CheckInTypeCombined = CheckInRunning & CheckInWeightLoss;
 
@@ -25,7 +25,6 @@ export function UserTables({ user }: UserTablesProps) {
   const type = user.challengeType;
   const [checkins, setCheckIns] = useState<CheckInTypeCombined[] | null>(null);
   const [resolution, setResolution] = useState<"isoWeek" | "month">("isoWeek");
-  const [interval, setInterval] = useState<number>(dayjs().utc().isoWeek());
   const [intervalDates, setIntervalDates] = useState<DateInterval>({
     startDate: dayjs().utc().startOf("isoWeek"),
     endDate: dayjs().utc().endOf("isoWeek"),
@@ -34,13 +33,11 @@ export function UserTables({ user }: UserTablesProps) {
   const setResolutionAndInterval = (res: "isoWeek" | "month") => {
     setResolution(res);
     if (res === "isoWeek") {
-      setInterval(dayjs().utc().isoWeek());
       setIntervalDates({
         startDate: dayjs().utc().startOf("isoWeek"),
         endDate: dayjs().utc().endOf("isoWeek"),
       });
     } else {
-      setInterval(dayjs().utc().month());
       setIntervalDates({
         startDate: dayjs().utc().startOf("month"),
         endDate: dayjs().utc().endOf("month"),
