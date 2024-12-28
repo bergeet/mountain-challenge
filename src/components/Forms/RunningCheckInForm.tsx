@@ -17,9 +17,9 @@ import { useState } from "react";
 import { Calendar } from "../ui/calendar";
 
 const formSchema = z.object({
-  walkingMinutes: z.number().int().positive(),
-  minutes: z.number().int().positive(),
-  km: z.number().int().positive(),
+  walkingMinutes: z.number().int().min(0).optional(),
+  minutes: z.number().int().min(0).optional(),
+  km: z.number().int().min(0).optional(),
   createdAt: z.date(),
 });
 

@@ -4,12 +4,8 @@ import { UserTables } from "@/components/UserTables/UserTables";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getUsers } from "./actions/checkins";
 
-//import dayjs from 'dayjs' // ES 2015
 export default async function Home() {
   const users = await getUsers();
-
-  // const runningCheckIns = await prisma.checkInRunning.findMany();
-  // const weightLossCheckIns = await prisma.checkInWeightLoss.findMany();
 
   return (
     <div className="flex flex-col  min-h-screen py-2 m-20">
