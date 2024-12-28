@@ -16,6 +16,8 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { ChallengeType } from "@prisma/client";
 import { Calendar } from "../ui/calendar";
+import { createOrUpdateCheckInWeightLoss } from "@/app/actions/checkins";
+import { Dayjs } from "dayjs";
 
 const formSchema = z.object({
   walkingMinutes: z.number().int().positive(),
@@ -51,18 +53,14 @@ export function WeightLossCheckIn({
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
     setLoading(true);
-    console.log(values);
-    fetch(`/api/checkins`, {
-      method: "POST",
-      body: JSON.stringify({
-        ...values,
-        userId: userId,
-        challengeType: ChallengeType.WEIGHTLOSS,
-        createdAt: values.createdAt.toLocaleDateString("sv-SE"),
-      }),
+    await createOrUpdateCheckInWeightLoss({
+      ...values,
+      userId,
+      challengeType: ChallengeType.WEIGHTLOSS,
+      createdAt: values.createdAt,
+      updatedAt: new Date(),
+      checkPointWeight: null,
     })
       .then(() => {
         setLoading(false);

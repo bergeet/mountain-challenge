@@ -54,7 +54,7 @@ export async function createOrUpdateCheckInRunning(
 }
 
 export async function createOrUpdateCheckInWeightLoss(
-  data: CheckInWeightLoss & { userId: string }
+  data: Omit<CheckInWeightLoss, "id"> & { userId: string }
 ) {
   const {
     walkingMinutes,

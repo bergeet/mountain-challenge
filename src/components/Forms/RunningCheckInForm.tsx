@@ -2,9 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import {
-  createOrUpdateCheckInRunning
-} from "@/app/actions/checkins";
+import { createOrUpdateCheckInRunning } from "@/app/actions/checkins";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -50,19 +48,6 @@ export function RunningCheckInForm({
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
-    fetch("/api/checkins", {
-      method: "POST",
-      body: JSON.stringify({
-        ...values,
-        userId: userId,
-        challengeType: ChallengeType.RUNNING,
-        createdAt: values.createdAt.toLocaleDateString("sv-SE"),
-      }),
-    }).then(() => {
-      setLoading(false);
-      onCheckIn();
-    });
-
     await createOrUpdateCheckInRunning({
       userId: userId,
       challengeType: "RUNNING",
@@ -72,6 +57,9 @@ export function RunningCheckInForm({
       createdAt: values.createdAt,
       updatedAt: new Date(),
       checkPointMileMinutes: null,
+    }).then(() => {
+      setLoading(false);
+      onCheckIn();
     });
   }
 
