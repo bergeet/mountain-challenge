@@ -12,6 +12,11 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { User } from "@prisma/client";
+import {
+  addAchievementToUser,
+  getAchievementTypes,
+} from "@/app/actions/achievements";
+import party from "party-js";
 
 interface CheckInProps {
   user: User;
@@ -20,8 +25,22 @@ interface CheckInProps {
 
 export function CheckIn({ user, onCheckIn }: CheckInProps) {
   const [showCheckInDialog, setShowCheckInDialog] = useState(false);
-  const onCheckInHandler = () => {
+  const onCheckInHandler = async () => {
     setShowCheckInDialog(false);
+    const achievmentTypes = (await getAchievementTypes()).filter(
+      (a) => a.name === "Välkommen till världen"
+    );
+    addAchievementToUser({
+      userId: user.id,
+      achievementTypeId: achievmentTypes[0].id,
+    });
+    const mainElement = document.getElementById("main");
+    if (mainElement) {
+      party.confetti(mainElement, {
+        count: party.variation.range(50, 150),
+        size: party.variation.range(1, 2.4),
+      });
+    }
     onCheckIn();
   };
   const showCheckIn = () => {

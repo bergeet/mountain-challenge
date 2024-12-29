@@ -1,29 +1,21 @@
 "use client";
 
+import { deleteCheckIn } from "@/app/actions/checkins";
 import { Button } from "../ui/button";
+import { ChallengeType } from "@prisma/client";
 
 export function DeleteCheckInButton({
   checkInId,
   type,
 }: {
   checkInId: string;
-  type: "running" | "weightLoss";
+  type: ChallengeType;
 }) {
-  const deleteCheckIn = async (id: string) => {
-    await fetch("/api/checkins", {
-      method: "DELETE",
-      body: JSON.stringify({
-        id,
-        type,
-      }),
-    });
-  };
-
   return (
     <div>
       <Button
         onClick={() => {
-          deleteCheckIn(checkInId);
+          deleteCheckIn(checkInId, type);
         }}
       >
         🗑️

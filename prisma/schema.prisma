@@ -99,8 +99,6 @@ model Achievement {
   user              User            @relation(fields: [userId], references: [id])
   achievementType   AchievementType @relation(fields: [achievementTypeId], references: [id])
   achievementTypeId String
-  points            Int
-  challengeType     ChallengeType
 
   @@unique([userId, createdAt])
 }

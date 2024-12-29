@@ -9,6 +9,7 @@ import { useCallback, useEffect, useState } from "react";
 import { CheckIn } from "../CheckIn/CheckIn";
 import { Button } from "../ui/button";
 import { WeeklyView } from "./WeeklyView";
+import { Achievements } from "../Achievements/Achievements";
 
 export type CheckInTypeCombined = CheckInRunning & CheckInWeightLoss;
 
@@ -56,7 +57,7 @@ export function UserTables({ user }: UserTablesProps) {
 
   const removeRow = async (id: string) => {
     await deleteCheckIn(id, type);
-    // fetchCheckIns();
+    await fetchCheckIns();
   };
 
   useEffect(() => {
@@ -123,5 +124,12 @@ export function UserTables({ user }: UserTablesProps) {
     );
   };
 
-  return <div className="w-full flex-col gap-8">{createUserTables()}</div>;
+  return (
+    <>
+      <div className="w-full flex-col gap-8">{createUserTables()}</div>
+      <div>
+        <Achievements userId={user.id} />
+      </div>
+    </>
+  );
 }

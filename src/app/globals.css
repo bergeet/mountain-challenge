@@ -76,3 +76,7 @@ body {
   --rdp-today-color: red;
   --rdp-today-color: red;
 }
+
+h1 {
+  @apply text-4xl font-bold;
+}

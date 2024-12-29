@@ -37,6 +37,7 @@ export function WeightLossCheckIn({
   userId,
 }: WeightLossCheckInProps) {
   const [loading, setLoading] = useState(false);
+
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

@@ -8,7 +8,7 @@ export default async function Home() {
   const users = await getUsers();
 
   return (
-    <div className="flex flex-col  min-h-screen py-2 m-20">
+    <div id="main" className="flex flex-col  min-h-screen py-2 m-20">
       <div className="flex flex-col gap-18 ">
         <Tabs defaultValue={users[0].id}>
           <TabsList className="flex flex-row w-full gap-8 md-8">
