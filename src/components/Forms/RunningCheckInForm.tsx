@@ -56,10 +56,14 @@ export function RunningCheckInForm({
       createdAt: values.createdAt,
       updatedAt: new Date(),
       checkPointMileMinutes: null,
-    }).then(() => {
-      setLoading(false);
-      onCheckIn();
-    });
+    })
+      .then(() => {
+        setLoading(false);
+        onCheckIn();
+      })
+      .catch(() => {
+        setLoading(false);
+      });
   }
 
   return (

@@ -7,7 +7,9 @@ import {
   CheckInRunning,
   CheckInWeightLoss,
 } from "@prisma/client";
+import dayjs from "dayjs";
 import { revalidatePath } from "next/cache";
+import { NextResponse } from "next/server";
 
 export async function createOrUpdateCheckInRunning(
   data: Omit<CheckInRunning, "id"> & { userId: string }
@@ -20,6 +22,20 @@ export async function createOrUpdateCheckInRunning(
 
   if (!user) {
     throw new Error("User not found");
+  }
+
+  const existingCheckin = await prisma.checkInRunning.findFirst({
+    where: {
+      userId: user.id,
+      createdAt: {
+        gte: dayjs(createdAt).startOf("day").toDate(),
+        lte: dayjs(createdAt).endOf("day").toDate(),
+      },
+    },
+  });
+
+  if (existingCheckin) {
+    throw new NextResponse("Checkin already exists", { status: 400 });
   }
 
   const checkIn = await prisma.checkInRunning.upsert({
@@ -68,6 +84,20 @@ export async function createOrUpdateCheckInWeightLoss(
 
   if (!user) {
     throw new Error("User not found");
+  }
+
+  const existingCheckin = await prisma.checkInWeightLoss.findFirst({
+    where: {
+      userId: user.id,
+      createdAt: {
+        gte: dayjs(createdAt).startOf("day").toDate(),
+        lte: dayjs(createdAt).endOf("day").toDate(),
+      },
+    },
+  });
+
+  if (existingCheckin) {
+    throw new Error("Checkin already exists");
   }
 
   const checkIn = await prisma.checkInWeightLoss.upsert({
