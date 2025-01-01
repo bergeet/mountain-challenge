@@ -1,17 +1,18 @@
 "use client";
 
 import { deleteCheckIn, getCheckIns } from "@/app/actions/checkins";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import dayjs from "@/lib/dayjs-configurations";
 import { CheckInRunning, CheckInWeightLoss, User } from "@prisma/client";
 import { type Dayjs } from "dayjs";
-import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { Achievements } from "../Achievements/Achievements";
 import { CheckIn } from "../CheckIn/CheckIn";
 import { Button } from "../ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { MonthlyData, MonthlyView, WeeklyData } from "./MonthlyView";
 import { WeeklyView } from "./WeeklyView";
-import { Achievements } from "../Achievements/Achievements";
-import { Card, CardHeader, CardContent, CardTitle } from "../ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export type CheckInTypeCombined = CheckInRunning & CheckInWeightLoss;
 
@@ -66,6 +67,53 @@ export function UserTables({ user }: UserTablesProps) {
     });
   };
 
+  const monthlyData = (): MonthlyData => {
+    const weeks: WeeklyData[] = [];
+    const monthStartDate = intervalDates.startDate;
+    checkins?.forEach((checkIn) => {
+      const day = dayjs(checkIn.createdAt);
+      const weekNumber = day.isoWeek();
+      const weekIndex = weeks.findIndex((week) => week.week === weekNumber);
+      const walkingMinutesPerWeek = checkins.reduce(
+        (acc, curr) =>
+          dayjs(curr.createdAt).isoWeek() === weekNumber
+            ? acc + curr.walkingMinutes
+            : acc,
+        0
+      );
+      const runningKmPerWeek = checkins.reduce(
+        (acc, curr) =>
+          dayjs(curr.createdAt).isoWeek() === weekNumber ? acc + curr.km : acc,
+        0
+      );
+
+      const dayIsValid =
+        checkIn.ateSugar !== undefined || checkIn.ateSugar !== null
+          ? !checkIn.ateSugar
+          : true;
+
+      const weekIsvalid =
+        walkingMinutesPerWeek > 180 &&
+        (!checkIn.ateSugar || runningKmPerWeek > 15);
+      const id = checkIn.id;
+
+      if (weekIndex === -1) {
+        weeks.push({
+          week: weekNumber,
+          days: [{ valid: dayIsValid, day, id }],
+          valid: weekIsvalid,
+        });
+      } else {
+        weeks[weekIndex].days.push({ valid: dayIsValid, day, id });
+      }
+    });
+
+    return {
+      month: monthStartDate.month() + 1,
+      weeks,
+    };
+  };
+
   useEffect(() => {
     fetchCheckIns();
   }, [fetchCheckIns]);
@@ -76,7 +124,7 @@ export function UserTables({ user }: UserTablesProps) {
         <CardHeader>
           <CardTitle className="text-2xl font-bold flex items-center gap-2">
             <Calendar className="w-6 h-6" />
-            {user.name}&apos;s Challenge
+            {user.name}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -121,8 +169,19 @@ export function UserTables({ user }: UserTablesProps) {
                 </Button>
               </div>
             </div>
-
-            <WeeklyView user={user} checkIn={checkins} removeRow={removeRow} />
+            {resolution === "isoWeek" ? (
+              <WeeklyView
+                user={user}
+                checkIn={checkins}
+                removeRow={removeRow}
+              />
+            ) : (
+              <MonthlyView
+                user={user}
+                data={monthlyData()}
+                removeRow={removeRow}
+              />
+            )}
           </div>
         </CardContent>
       </Card>

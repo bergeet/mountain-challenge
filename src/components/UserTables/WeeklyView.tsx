@@ -47,6 +47,7 @@ export function WeeklyView({ user, checkIn, removeRow }: WeeklyViewProps) {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[50px]">Godkänd</TableHead>
               {columns.map((column) => (
                 <TableHead key={column.label} className="text-right">
                   {column.label}

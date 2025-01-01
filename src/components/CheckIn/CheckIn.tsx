@@ -5,7 +5,6 @@ import party from "party-js";
 import { useState } from "react";
 import { RunningCheckInForm } from "../Forms/RunningCheckInForm";
 import { WeightLossCheckIn } from "../Forms/WeightLossCheckIn";
-import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import {
   Dialog,
@@ -58,7 +57,7 @@ export function CheckIn({ user, onCheckIn }: CheckInProps) {
       onOpenChange={(v) => setShowCheckInDialog(v)}
     >
       <DialogTrigger onClick={() => setShowCheckInDialog(true)}>
-        <Button className="w-full" variant="default">Checka in</Button>
+        <h1 className="w-full">Checka in</h1>
       </DialogTrigger>
       <DialogContent className="bg-gray-900/70">
         <DialogHeader>
