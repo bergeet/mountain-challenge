@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import dayjs from "./dayjs-configurations";
+import party from "party-js";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -62,4 +63,26 @@ export function getDatesOfMonth(year: number, month: number) {
   const endOfMonth = startOfMonth.endOf("month");
 
   return [startOfMonth, endOfMonth];
+}
+
+export function playWeeklyWin() {
+  const audio = document.getElementById("weeklyWin") as HTMLAudioElement;
+  audio.play();
+  const mainElement = document.getElementsByTagName("main")[0];
+  if (mainElement) {
+    party.sparkles(mainElement, {
+      count: party.variation.range(200, 300),
+      size: party.variation.range(1, 2.4),
+    });
+  }
+}
+
+export function playConfetti() {
+  const mainElement = document.getElementsByTagName("main")[0];
+  if (mainElement) {
+    party.confetti(mainElement, {
+      count: party.variation.range(50, 150),
+      size: party.variation.range(1, 2.4),
+    });
+  }
 }

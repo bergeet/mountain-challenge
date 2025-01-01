@@ -1,7 +1,8 @@
 "use client";
 
+import { useToast } from "@/hooks/use-toast";
+import { playConfetti } from "@/lib/utils";
 import { User } from "@prisma/client";
-import party from "party-js";
 import { useState } from "react";
 import { RunningCheckInForm } from "../Forms/RunningCheckInForm";
 import { WeightLossCheckIn } from "../Forms/WeightLossCheckIn";
@@ -22,6 +23,8 @@ interface CheckInProps {
 
 export function CheckIn({ user, onCheckIn }: CheckInProps) {
   const [showCheckInDialog, setShowCheckInDialog] = useState(false);
+  const { toast } = useToast();
+
   const onCheckInHandler = async () => {
     setShowCheckInDialog(false);
     // const achievmentTypes = (await getAchievementTypes()).filter(
@@ -31,13 +34,11 @@ export function CheckIn({ user, onCheckIn }: CheckInProps) {
     //   userId: user.id,
     //   achievementTypeId: achievmentTypes[0].id,
     // }).catch((e) => console.error(e));
-    const mainElement = document.getElementById("main");
-    if (mainElement) {
-      party.confetti(mainElement, {
-        count: party.variation.range(50, 150),
-        size: party.variation.range(1, 2.4),
-      });
-    }
+    playConfetti();
+    toast({
+      title: "Checkat in! 🙌",
+      description: `Din incheckning är registrerad.`,
+    });
     onCheckIn();
   };
   const showCheckIn = () => {

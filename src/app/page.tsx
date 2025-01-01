@@ -1,14 +1,14 @@
 import { UserTables } from "@/components/UserTables/UserTables";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getUsers } from "./actions/checkins";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Mountain } from "lucide-react";
+import { getUsers } from "./actions/checkins";
 
 export default async function Home() {
   const users = await getUsers();
 
   return (
-    <div id="main" className="min-h-screen bg-gradient-to-b from-gray-900 text-white">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 text-white">
       <div className="container mx-auto px-4 py-8">
         <Card className="bg-gray-800/50 border-gray-700">
           <CardHeader className="border-b border-gray-700 pb-6">
@@ -39,6 +39,9 @@ export default async function Home() {
           </CardContent>
         </Card>
       </div>
+      <audio id="weeklyWin">
+        <source type="audio/mp3" src="/weeklywin.mp3" />
+      </audio>
     </div>
   );
 }

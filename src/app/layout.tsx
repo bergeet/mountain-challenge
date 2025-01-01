@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "@/lib/dayjs-configurations";
 
 import "./globals.css";
+import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,7 +30,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased background`}
       >
-        <div className="content">{children}</div>
+        <main className="content">{children}</main>
+        <Toaster />
       </body>
     </html>
   );

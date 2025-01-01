@@ -93,7 +93,7 @@ export function UserTables({ user }: UserTablesProps) {
           : true;
 
       const weekIsvalid =
-        walkingMinutesPerWeek > 180 &&
+        walkingMinutesPerWeek >= 180 &&
         (!checkIn.ateSugar || runningKmPerWeek > 15);
       const id = checkIn.id;
 
