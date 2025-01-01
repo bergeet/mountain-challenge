@@ -76,7 +76,7 @@ export function UserTables({ user }: UserTablesProps) {
         <CardHeader>
           <CardTitle className="text-2xl font-bold flex items-center gap-2">
             <Calendar className="w-6 h-6" />
-            {user.name}'s Challenge
+            {user.name}&apos;s Challenge
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -86,8 +86,8 @@ export function UserTables({ user }: UserTablesProps) {
             <div className="flex flex-col sm:flex-row gap-4 justify-between items-center w-full">
               <Tabs
                 value={resolution}
-                onValueChange={(value: "isoWeek" | "month") =>
-                  setResolutionAndInterval(value)
+                onValueChange={(value: string) =>
+                  setResolutionAndInterval(value as "isoWeek" | "month")
                 }
               >
                 <TabsList>
