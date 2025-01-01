@@ -11,7 +11,7 @@ import {
 import { CheckInTypeCombined } from "./UserTables";
 import { CardContent } from "../ui/card";
 import { Button } from "../ui/button";
-import { Trash2 } from "lucide-react";
+import { BadgeCheck, BadgeX, Trash2 } from "lucide-react";
 
 const tableConfigurations: Record<
   ChallengeType,
@@ -59,11 +59,11 @@ export function WeeklyView({ user, checkIn, removeRow }: WeeklyViewProps) {
             {checkIn?.map((checkInItem) => (
               <TableRow
                 key={checkInItem.id}
-                className={cn(
-                  getValidityClass(!checkInItem.ateSugar),
-                  "transition-colors hover:bg-gray-100 hover:text-black"
-                )}
+                className={`transition-colors hover:bg-gray-100 hover:text-black`}
               >
+                <TableCell>
+                 {checkInItem.ateSugar ? <BadgeX className="text-red-400" /> :  <BadgeCheck className="text-green-400"/>}
+                </TableCell>
                 {columns.map((col) => (
                   <TableCell key={col.attribute} className="text-right">
                     {getAttributesTypes(checkInItem[col.attribute])}
