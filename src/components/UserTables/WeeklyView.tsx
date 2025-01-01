@@ -1,17 +1,17 @@
-import { getAttributesTypes, getValidityClass } from "@/lib/utils";
+import { getAttributesTypes, getValidityClass, cn } from "@/lib/utils";
+import { ChallengeType, User } from "@prisma/client";
 import {
-    ChallengeType,
-    User
-} from "@prisma/client";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "../ui/table";
 import { CheckInTypeCombined } from "./UserTables";
+import { CardContent } from "../ui/card";
+import { Button } from "../ui/button";
+import { Trash2 } from "lucide-react";
 
 const tableConfigurations: Record<
   ChallengeType,
@@ -40,44 +40,50 @@ interface WeeklyViewProps {
 
 export function WeeklyView({ user, checkIn, removeRow }: WeeklyViewProps) {
   const columns = tableConfigurations[user.challengeType];
+
   return (
-    <Table key={user.id} className="w-full border border-gray-200">
-      <TableHeader>
-        <TableRow>
-          {columns.map((column) => (
-            <TableHead key={column.label} className="w-full">
-              {column.label}
-            </TableHead>
-          ))}
-        </TableRow>
-      </TableHeader>
-      <TableBody className="min-w-48 w-full">
-        {checkIn?.map((checkIn, i) => (
-          <TableRow
-            key={i}
-            style={{
-              color: "black",
-              backgroundColor: checkIn.ateSugar ? "bg-red-200" : "bg-green-200",
-            }}
-            className={`${getValidityClass(!checkIn.ateSugar)}`}
-          >
-            {columns.map((col, i) => (
-              <TableCell key={i} className="w-full">
-                {getAttributesTypes(checkIn[col.attribute])}
-              </TableCell>
-            ))}
-            <TableCell className="w-full">
-              <button
-                onClick={() => {
-                  removeRow(checkIn.id);
-                }}
+    <CardContent className="p-0">
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {columns.map((column) => (
+                <TableHead key={column.label} className="text-right">
+                  {column.label}
+                </TableHead>
+              ))}
+              <TableHead className="w-[50px]" />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {checkIn?.map((checkInItem) => (
+              <TableRow
+                key={checkInItem.id}
+                className={cn(
+                  getValidityClass(!checkInItem.ateSugar),
+                  "transition-colors hover:bg-gray-100 hover:text-black"
+                )}
               >
-                💣
-              </button>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+                {columns.map((col) => (
+                  <TableCell key={col.attribute} className="text-right">
+                    {getAttributesTypes(checkInItem[col.attribute])}
+                  </TableCell>
+                ))}
+                <TableCell>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeRow(checkInItem.id)}
+                    aria-label="Remove check-in"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </CardContent>
   );
 }
