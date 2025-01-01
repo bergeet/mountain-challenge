@@ -3,7 +3,13 @@
 import { deleteCheckIn, getCheckIns } from "@/app/actions/checkins";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import dayjs from "@/lib/dayjs-configurations";
-import { CheckInRunning, CheckInWeightLoss, User } from "@prisma/client";
+import {
+  ChallengeType,
+  CheckInRunning,
+  CheckInWeightLoss,
+  User,
+  UserDetails,
+} from "@prisma/client";
 import { type Dayjs } from "dayjs";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -13,6 +19,9 @@ import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { MonthlyData, MonthlyView, WeeklyData } from "./MonthlyView";
 import { WeeklyView } from "./WeeklyView";
+import { UserDetailsWeightLoss } from "../UserDetails/UserDetailsWeightLoss";
+import { UserDetailsRunning } from "../UserDetails/UserDetailsRunning";
+import { getUserDetails } from "@/app/actions/userdetails";
 
 export type CheckInTypeCombined = CheckInRunning & CheckInWeightLoss;
 
@@ -33,6 +42,7 @@ export function UserTables({ user }: UserTablesProps) {
     startDate: dayjs().utc().startOf("isoWeek"),
     endDate: dayjs().utc().endOf("isoWeek"),
   });
+  const [userDetails, setUserDetails] = useState<UserDetails[] | null>(null);
 
   const setResolutionAndInterval = (res: "isoWeek" | "month") => {
     setResolution(res);
@@ -52,9 +62,15 @@ export function UserTables({ user }: UserTablesProps) {
     setCheckIns(data);
   }, [intervalDates, type, user.id]);
 
+  const fetchUserDetails = useCallback(async () => {
+    const data = await getUserDetails(user.id);
+    setUserDetails(data);
+  }, [user.id]);
+
   const removeRow = async (id: string) => {
     await deleteCheckIn(id, type);
     await fetchCheckIns();
+    await fetchUserDetails();
   };
 
   const handleIntervalChange = (direction: "next" | "previous") => {
@@ -114,9 +130,15 @@ export function UserTables({ user }: UserTablesProps) {
     };
   };
 
+  const handleCheckIn = async () => {
+    await fetchCheckIns();
+    await fetchUserDetails();
+  };
+
   useEffect(() => {
     fetchCheckIns();
-  }, [fetchCheckIns]);
+    fetchUserDetails();
+  }, [fetchCheckIns, fetchUserDetails]);
 
   return (
     <div className="flex flex-col gap-8 w-full mx-auto">
@@ -129,7 +151,7 @@ export function UserTables({ user }: UserTablesProps) {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-6">
-            <CheckIn onCheckIn={fetchCheckIns} user={user} />
+            <CheckIn onCheckIn={handleCheckIn} user={user} />
 
             <div className="flex flex-col sm:flex-row gap-4 justify-between items-center w-full">
               <Tabs
@@ -187,6 +209,11 @@ export function UserTables({ user }: UserTablesProps) {
       </Card>
 
       <Achievements userId={user.id} />
+      {user.challengeType === ChallengeType.WEIGHTLOSS ? (
+        <UserDetailsWeightLoss userDetail={userDetails} />
+      ) : (
+        <UserDetailsRunning userDetail={userDetails} />
+      )}
     </div>
   );
 }

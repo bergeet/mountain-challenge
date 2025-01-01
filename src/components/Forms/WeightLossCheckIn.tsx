@@ -3,7 +3,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { createOrUpdateCheckInWeightLoss } from "@/app/actions/checkins";
+import {
+  createOrUpdateCheckInWeightLoss,
+  createUserDetailCheckIn,
+} from "@/app/actions/checkins";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -18,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { ChallengeType } from "@prisma/client";
 import { useState } from "react";
 import { Calendar } from "../ui/calendar";
+import { Separator } from "../ui/separator";
 
 const formSchema = z.object({
   walkingMinutes: z.number().int().min(0).optional().default(0),
@@ -26,6 +30,7 @@ const formSchema = z.object({
   ateSugar: z.boolean(),
   wentToGym: z.boolean(),
   createdAt: z.date(),
+  currentWeight: z.number().int().min(0).optional().default(0),
 });
 
 interface WeightLossCheckInProps {
@@ -49,6 +54,7 @@ export function WeightLossCheckIn({
       ateSugar: false,
       wentToGym: false,
       createdAt: new Date(),
+      currentWeight: 0,
     },
   });
 
@@ -71,6 +77,15 @@ export function WeightLossCheckIn({
         console.error(e);
         setLoading(false);
       });
+
+    if (values.currentWeight > 0) {
+      createUserDetailCheckIn({
+        userId: userId,
+        createdAt: values.createdAt,
+        weight: values.currentWeight,
+        tenKmPace: null,
+      });
+    }
   }
 
   return (
@@ -123,64 +138,67 @@ export function WeightLossCheckIn({
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="ateLunch"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-              <FormControl>
-                <Checkbox
-                  className="ml-2"
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-              <div className="space-y-1 leading-none">
-                <FormLabel>Åt lunch</FormLabel>
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="ateDinner"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-              <FormControl>
-                <Checkbox
-                  className="ml-2"
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-              <div className="space-y-1 leading-none">
-                <FormLabel>Åt middag</FormLabel>
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="ateSugar"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-              <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-              <div className="space-y-1 leading-none">
-                <FormLabel>Åt snacks under dagen</FormLabel>
-                <FormDescription>
-                  Kan vara godis, bullar eller liknande.
-                </FormDescription>
-              </div>
-            </FormItem>
-          )}
-        />
+        <div className="flex flex-row space-x-4">
+          <FormField
+            control={form.control}
+            name="ateLunch"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                <FormControl>
+                  <Checkbox
+                    className="ml-2"
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel>Åt lunch</FormLabel>
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="ateDinner"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                <FormControl>
+                  <Checkbox
+                    className="ml-2"
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel>Åt middag</FormLabel>
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="ateSugar"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel>Åt snacks under dagen</FormLabel>
+                  <FormDescription>
+                    Kan vara godis, bullar eller liknande.
+                  </FormDescription>
+                </div>
+              </FormItem>
+            )}
+          />
+        </div>
+
         <FormField
           control={form.control}
           name="wentToGym"
@@ -200,6 +218,35 @@ export function WeightLossCheckIn({
             </FormItem>
           )}
         />
+
+        <Separator />
+
+        <FormField
+          control={form.control}
+          name="currentWeight"
+          render={({ field }) => (
+            <FormItem className="flex flex-col-reverse items-start space-x-3 space-y-0 rounded-md border p-4 gap-4">
+              <FormControl>
+                <Input
+                  {...field}
+                  onChange={(v) =>
+                    field.onChange(
+                      v.target.value.trim() === "" ||
+                        isNaN(Number(v.target.value))
+                        ? ""
+                        : parseFloat(v.target.value)
+                    )
+                  }
+                />
+              </FormControl>
+              <div className="flex flex-col space-y-1"></div>
+              <FormLabel>Nuvarande vikt</FormLabel>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Separator />
 
         <Button loading={loading} type="submit">
           Submit

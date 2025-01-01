@@ -75,12 +75,12 @@ model Challenge {
 }
 
 model UserDetails {
-  id         String @id @default(cuid())
-  userId     String
-  user       User   @relation(fields: [userId], references: [id])
-  fiveKmTime Float
-  tenKmTime  Float
-  weight     Float
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  tenKmPace Float?
+  weight    Float?
+  createdAt DateTime @default(now())
 }
 
 model AchievementType {

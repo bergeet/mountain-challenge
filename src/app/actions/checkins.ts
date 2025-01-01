@@ -6,10 +6,37 @@ import {
   ChallengeType,
   CheckInRunning,
   CheckInWeightLoss,
+  UserDetails,
 } from "@prisma/client";
 import dayjs from "dayjs";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
+
+export async function createUserDetailCheckIn(
+  data: Omit<UserDetails, "id"> & { userId: string }
+) {
+  const { userId, ...rest } = data;
+
+  const user = await prisma.user.findFirst({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  console.log("Creating user detail", data);
+
+  const userDetail = await prisma.userDetails.create({
+    data: {
+      ...rest,
+      user: { connect: { id: user.id } },
+    },
+  });
+
+  revalidatePath("/", "layout");
+  return userDetail;
+}
 
 export async function createOrUpdateCheckInRunning(
   data: Omit<CheckInRunning, "id"> & { userId: string }

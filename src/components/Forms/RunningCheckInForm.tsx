@@ -2,7 +2,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { createOrUpdateCheckInRunning } from "@/app/actions/checkins";
+import {
+  createOrUpdateCheckInRunning,
+  createUserDetailCheckIn,
+} from "@/app/actions/checkins";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -15,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Calendar } from "../ui/calendar";
+import { Separator } from "../ui/separator";
 
 const formSchema = z.object({
   walkingMinutes: z.number().int().min(0).optional().default(0),
@@ -64,6 +68,15 @@ export function RunningCheckInForm({
       .catch(() => {
         setLoading(false);
       });
+
+    if (values.km >= 10) {
+      createUserDetailCheckIn({
+        userId: userId,
+        createdAt: values.createdAt,
+        tenKmPace: values.minutes / values.km,
+        weight: null,
+      });
+    }
   }
 
   return (
@@ -115,55 +128,59 @@ export function RunningCheckInForm({
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="minutes"
-          render={({ field }) => (
-            <FormItem className="flex flex-col-reverse items-start space-x-3 space-y-0 rounded-md border p-4 gap-4">
-              <FormControl>
-                <Input
-                  {...field}
-                  onChange={(v) =>
-                    field.onChange(
-                      v.target.value.trim() === "" ||
-                        isNaN(Number(v.target.value))
-                        ? ""
-                        : parseFloat(v.target.value)
-                    )
-                  }
-                />
-              </FormControl>
-              <div className="flex flex-col space-y-1"></div>
-              <FormLabel>Löptid i min</FormLabel>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="km"
-          render={({ field }) => (
-            <FormItem className="flex flex-col-reverse items-start space-x-3 space-y-0 rounded-md border p-4 gap-4">
-              <FormControl>
-                <Input
-                  {...field}
-                  onChange={(v) =>
-                    field.onChange(
-                      v.target.value.trim() === "" ||
-                        isNaN(Number(v.target.value))
-                        ? ""
-                        : parseFloat(v.target.value)
-                    )
-                  }
-                />
-              </FormControl>
-              <div className="flex flex-col space-y-1">
-                <FormLabel>Längd in km</FormLabel>
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="flex flex-row space-x-4">
+          <FormField
+            control={form.control}
+            name="minutes"
+            render={({ field }) => (
+              <FormItem className="flex flex-col-reverse items-start space-x-3 space-y-0 rounded-md border p-4 gap-4">
+                <FormControl>
+                  <Input
+                    {...field}
+                    onChange={(v) =>
+                      field.onChange(
+                        v.target.value.trim() === "" ||
+                          isNaN(Number(v.target.value))
+                          ? ""
+                          : parseFloat(v.target.value)
+                      )
+                    }
+                  />
+                </FormControl>
+                <div className="flex flex-col space-y-1"></div>
+                <FormLabel>Löptid i min</FormLabel>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="km"
+            render={({ field }) => (
+              <FormItem className="flex flex-col-reverse items-start space-x-3 space-y-0 rounded-md border p-4 gap-4">
+                <FormControl>
+                  <Input
+                    {...field}
+                    onChange={(v) =>
+                      field.onChange(
+                        v.target.value.trim() === "" ||
+                          isNaN(Number(v.target.value))
+                          ? ""
+                          : parseFloat(v.target.value)
+                      )
+                    }
+                  />
+                </FormControl>
+                <div className="flex flex-col space-y-1">
+                  <FormLabel>Längd in km</FormLabel>
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <Separator />
 
         <Button loading={loading} type="submit">
           Submit
