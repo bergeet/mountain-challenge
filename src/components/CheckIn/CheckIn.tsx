@@ -67,7 +67,7 @@ export function CheckIn({ user, onCheckIn }: CheckInProps) {
             Dagens aktivitet för {user.name}
           </DialogDescription>
         </DialogHeader>
-        <Card className="border-gray-800 bg-gray-900/90 text-white shadow-lg p-4">
+        <Card className="border-gray-800 bg-gray-900/90 text-white shadow-lg p-4 w-full">
           {showCheckIn()}
         </Card>
       </DialogContent>

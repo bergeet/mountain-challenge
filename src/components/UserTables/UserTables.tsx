@@ -1,6 +1,7 @@
 "use client";
 
 import { deleteCheckIn, getCheckIns } from "@/app/actions/checkins";
+import { getUserDetails } from "@/app/actions/userdetails";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import dayjs from "@/lib/dayjs-configurations";
 import {
@@ -17,11 +18,10 @@ import { Achievements } from "../Achievements/Achievements";
 import { CheckIn } from "../CheckIn/CheckIn";
 import { Button } from "../ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { UserDetailsRunning } from "../UserDetails/UserDetailsRunning";
+import { UserDetailsWeightLoss } from "../UserDetails/UserDetailsWeightLoss";
 import { MonthlyData, MonthlyView, WeeklyData } from "./MonthlyView";
 import { WeeklyView } from "./WeeklyView";
-import { UserDetailsWeightLoss } from "../UserDetails/UserDetailsWeightLoss";
-import { UserDetailsRunning } from "../UserDetails/UserDetailsRunning";
-import { getUserDetails } from "@/app/actions/userdetails";
 
 export type CheckInTypeCombined = CheckInRunning & CheckInWeightLoss;
 
