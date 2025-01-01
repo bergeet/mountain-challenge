@@ -234,6 +234,9 @@ export async function getCheckIns(
           lte: intervalTo,
         },
       },
+      orderBy: {
+        createdAt: "asc",
+      },
     });
   } else if (type === ChallengeType.WEIGHTLOSS) {
     return await prisma.checkInWeightLoss.findMany({
@@ -243,6 +246,9 @@ export async function getCheckIns(
           gte: intervalFrom,
           lte: intervalTo,
         },
+      },
+      orderBy: {
+        createdAt: "asc",
       },
     });
   }
