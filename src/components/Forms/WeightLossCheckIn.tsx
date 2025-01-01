@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -79,16 +80,18 @@ export function WeightLossCheckIn({
           control={form.control}
           name="createdAt"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Datum</FormLabel>
+            <FormItem className="flex flex-col-reverse items-start space-x-3 space-y-0 rounded-md border p-4">
               <FormControl>
                 <Calendar
                   {...field}
                   selected={field.value}
                   mode="single"
                   onSelect={(v) => field.onChange(v)}
+                  className="w-full"
                 />
               </FormControl>
+              <div className="space-y-1 leading-none"></div>
+              <FormLabel>Datum</FormLabel>
               <FormMessage />
             </FormItem>
           )}
@@ -98,8 +101,7 @@ export function WeightLossCheckIn({
           control={form.control}
           name="walkingMinutes"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Promenad (min)</FormLabel>
+            <FormItem className="flex flex-col-reverse gap-4 items-start space-x-3 space-y-0 rounded-md border p-4">
               <FormControl>
                 <Input
                   {...field}
@@ -114,6 +116,9 @@ export function WeightLossCheckIn({
                   }
                 />
               </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>Promenad (min)</FormLabel>
+              </div>
               <FormMessage />
             </FormItem>
           )}
@@ -122,8 +127,7 @@ export function WeightLossCheckIn({
           control={form.control}
           name="ateLunch"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Åt lunch</FormLabel>
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
               <FormControl>
                 <Checkbox
                   className="ml-2"
@@ -131,6 +135,9 @@ export function WeightLossCheckIn({
                   onCheckedChange={field.onChange}
                 />
               </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>Åt lunch</FormLabel>
+              </div>
               <FormMessage />
             </FormItem>
           )}
@@ -139,8 +146,7 @@ export function WeightLossCheckIn({
           control={form.control}
           name="ateDinner"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Åt middag</FormLabel>
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
               <FormControl>
                 <Checkbox
                   className="ml-2"
@@ -148,6 +154,9 @@ export function WeightLossCheckIn({
                   onCheckedChange={field.onChange}
                 />
               </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>Åt middag</FormLabel>
+              </div>
               <FormMessage />
             </FormItem>
           )}
@@ -156,16 +165,19 @@ export function WeightLossCheckIn({
           control={form.control}
           name="ateSugar"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Åt socker</FormLabel>
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
               <FormControl>
                 <Checkbox
-                  className="ml-2"
                   checked={field.value}
                   onCheckedChange={field.onChange}
                 />
               </FormControl>
-              <FormMessage />
+              <div className="space-y-1 leading-none">
+                <FormLabel>Åt snacks under dagen</FormLabel>
+                <FormDescription>
+                  Kan vara godis, bullar eller liknande.
+                </FormDescription>
+              </div>
             </FormItem>
           )}
         />
@@ -173,8 +185,7 @@ export function WeightLossCheckIn({
           control={form.control}
           name="wentToGym"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Gick till gymmet</FormLabel>
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
               <FormControl>
                 <Checkbox
                   checked={field.value}
@@ -182,6 +193,9 @@ export function WeightLossCheckIn({
                   onCheckedChange={field.onChange}
                 />
               </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>Gick till gymmet</FormLabel>
+              </div>
               <FormMessage />
             </FormItem>
           )}

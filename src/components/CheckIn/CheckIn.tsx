@@ -6,13 +6,15 @@ import { useState } from "react";
 import { RunningCheckInForm } from "../Forms/RunningCheckInForm";
 import { WeightLossCheckIn } from "../Forms/WeightLossCheckIn";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "../ui/dialog";
+import { Card, CardContent } from "../ui/card";
+import { Button } from "../ui/button";
 
 interface CheckInProps {
   user: User;
@@ -51,28 +53,24 @@ export function CheckIn({ user, onCheckIn }: CheckInProps) {
     }
   };
   return (
-    <>
-      <Dialog
-        open={showCheckInDialog}
-        onOpenChange={(v) => setShowCheckInDialog(v)}
-      >
-        <DialogTrigger onClick={() => setShowCheckInDialog(true)}>
-          Checka in
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Checka in</DialogTitle>
-            <DialogDescription>
-              This action cannot be undone. This will permanently delete your
-              account and remove your data from our servers.
-            </DialogDescription>
-          </DialogHeader>
-          <div>{showCheckIn()}</div>
-        </DialogContent>
-      </Dialog>
-      {/* <div className="flex flex-col gap-8 border border-gray-200 p-8 rounded-md">
-        <h1 className="text-4xl font-bold text-left">Checka in</h1>
-      </div> */}
-    </>
+    <Dialog
+      open={showCheckInDialog}
+      onOpenChange={(v) => setShowCheckInDialog(v)}
+    >
+      <DialogTrigger onClick={() => setShowCheckInDialog(true)}>
+        <Button className="w-full" variant="default">Checka in</Button>
+      </DialogTrigger>
+      <DialogContent className="bg-gray-900/70">
+        <DialogHeader>
+          <DialogTitle>Checka in</DialogTitle>
+          <DialogDescription>
+            Dagens aktivitet för {user.name}
+          </DialogDescription>
+        </DialogHeader>
+        <Card className="border-gray-800 bg-gray-900/90 text-white shadow-lg p-4">
+          {showCheckIn()}
+        </Card>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -73,8 +73,7 @@ export function RunningCheckInForm({
           control={form.control}
           name="createdAt"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Datum</FormLabel>
+            <FormItem className="flex flex-col-reverse items-start space-x-3 space-y-0 rounded-md border p-4 gap-4">
               <FormControl>
                 <Calendar
                   {...field}
@@ -83,6 +82,9 @@ export function RunningCheckInForm({
                   onSelect={(v) => field.onChange(v)}
                 />
               </FormControl>
+              <div className="flex flex-col space-y-1">
+                <FormLabel>Datum</FormLabel>
+              </div>
               <FormMessage />
             </FormItem>
           )}
@@ -92,8 +94,7 @@ export function RunningCheckInForm({
           control={form.control}
           name="walkingMinutes"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Promenad (min)</FormLabel>
+            <FormItem className="flex flex-col-reverse items-start space-x-3 space-y-0 rounded-md border p-4 gap-4">
               <FormControl>
                 <Input
                   {...field}
@@ -107,6 +108,9 @@ export function RunningCheckInForm({
                   }
                 />
               </FormControl>
+              <div className="flex flex-col space-y-1">
+                <FormLabel>Promenad (min)</FormLabel>
+              </div>
               <FormMessage />
             </FormItem>
           )}
@@ -115,8 +119,7 @@ export function RunningCheckInForm({
           control={form.control}
           name="minutes"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Löptid i min</FormLabel>
+            <FormItem className="flex flex-col-reverse items-start space-x-3 space-y-0 rounded-md border p-4 gap-4">
               <FormControl>
                 <Input
                   {...field}
@@ -130,6 +133,8 @@ export function RunningCheckInForm({
                   }
                 />
               </FormControl>
+              <div className="flex flex-col space-y-1"></div>
+              <FormLabel>Löptid i min</FormLabel>
               <FormMessage />
             </FormItem>
           )}
@@ -138,8 +143,7 @@ export function RunningCheckInForm({
           control={form.control}
           name="km"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Längd in km</FormLabel>
+            <FormItem className="flex flex-col-reverse items-start space-x-3 space-y-0 rounded-md border p-4 gap-4">
               <FormControl>
                 <Input
                   {...field}
@@ -153,6 +157,9 @@ export function RunningCheckInForm({
                   }
                 />
               </FormControl>
+              <div className="flex flex-col space-y-1">
+                <FormLabel>Längd in km</FormLabel>
+              </div>
               <FormMessage />
             </FormItem>
           )}
