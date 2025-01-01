@@ -5,6 +5,8 @@ import party from "party-js";
 import { useState } from "react";
 import { RunningCheckInForm } from "../Forms/RunningCheckInForm";
 import { WeightLossCheckIn } from "../Forms/WeightLossCheckIn";
+import { Button } from "../ui/button";
+import { Card } from "../ui/card";
 import {
   Dialog,
   DialogContent,
@@ -13,8 +15,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { Card, CardContent } from "../ui/card";
-import { Button } from "../ui/button";
 
 interface CheckInProps {
   user: User;

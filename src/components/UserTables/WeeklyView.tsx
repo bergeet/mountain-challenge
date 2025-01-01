@@ -1,5 +1,8 @@
-import { getAttributesTypes, getValidityClass, cn } from "@/lib/utils";
+import { getAttributesTypes } from "@/lib/utils";
 import { ChallengeType, User } from "@prisma/client";
+import { BadgeCheck, BadgeX, Trash2 } from "lucide-react";
+import { Button } from "../ui/button";
+import { CardContent } from "../ui/card";
 import {
   Table,
   TableBody,
@@ -9,9 +12,6 @@ import {
   TableRow,
 } from "../ui/table";
 import { CheckInTypeCombined } from "./UserTables";
-import { CardContent } from "../ui/card";
-import { Button } from "../ui/button";
-import { BadgeCheck, BadgeX, Trash2 } from "lucide-react";
 
 const tableConfigurations: Record<
   ChallengeType,
