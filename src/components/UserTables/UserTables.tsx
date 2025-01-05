@@ -7,6 +7,7 @@ import dayjs from "@/lib/dayjs-configurations";
 import {
   ChallengeType,
   CheckInRunning,
+  CheckInSmoking,
   CheckInWeightLoss,
   User,
   UserDetails,
@@ -23,7 +24,9 @@ import { UserDetailsWeightLoss } from "../UserDetails/UserDetailsWeightLoss";
 import { MonthlyData, MonthlyView, WeeklyData } from "./MonthlyView";
 import { WeeklyView } from "./WeeklyView";
 
-export type CheckInTypeCombined = CheckInRunning & CheckInWeightLoss;
+export type CheckInTypeCombined = CheckInRunning &
+  CheckInWeightLoss &
+  CheckInSmoking;
 
 interface UserTablesProps {
   user: User;
@@ -211,9 +214,9 @@ export function UserTables({ user }: UserTablesProps) {
       <Achievements userId={user.id} />
       {user.challengeType === ChallengeType.WEIGHTLOSS ? (
         <UserDetailsWeightLoss userDetail={userDetails} />
-      ) : (
+      ) : user.challengeType === ChallengeType.RUNNING ? (
         <UserDetailsRunning userDetail={userDetails} />
-      )}
+      ) : null}
     </div>
   );
 }

@@ -19,7 +19,7 @@ export default async function Home() {
           </CardHeader>
           <CardContent className="pt-6">
             <Tabs defaultValue={users[0].id} className="space-y-6">
-              <TabsList className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-2">
+              <TabsList className="lg:grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-2 w-full">
                 {users.map((user) => (
                   <TabsTrigger
                     key={user.id}

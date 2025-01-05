@@ -84,6 +84,7 @@ export function WeightLossCheckIn({
         createdAt: values.createdAt,
         weight: values.currentWeight,
         tenKmPace: null,
+        smokedCigarettes: null,
       });
     }
   }

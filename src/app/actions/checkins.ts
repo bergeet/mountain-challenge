@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import {
   ChallengeType,
   CheckInRunning,
+  CheckInSmoking,
   CheckInWeightLoss,
   UserDetails,
 } from "@prisma/client";
@@ -158,6 +159,58 @@ export async function createOrUpdateCheckInWeightLoss(
   return checkIn;
 }
 
+export async function createOrUpdateCheckInSmoking(
+  data: Omit<CheckInSmoking, "id"> & { userId: string }
+) {
+  const { smokedCigarettes, walkingMinutes, createdAt, userId } = data;
+
+  const user = await prisma.user.findFirst({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const existingCheckin = await prisma.checkInSmoking.findFirst({
+    where: {
+      userId: user.id,
+      createdAt: {
+        gte: dayjs(createdAt).startOf("day").toDate(),
+        lte: dayjs(createdAt).endOf("day").toDate(),
+      },
+    },
+  });
+
+  if (existingCheckin) {
+    throw new Error("Checkin already exists");
+  }
+
+  const checkIn = await prisma.checkInSmoking.upsert({
+    where: {
+      userId_createdAt: {
+        userId: user.id,
+        createdAt,
+      },
+    },
+    update: {
+      smokedCigarettes,
+      walkingMinutes,
+      challengeType: ChallengeType.SMOKING,
+    },
+    create: {
+      createdAt,
+      user: { connect: { id: user.id } },
+      smokedCigarettes,
+      walkingMinutes,
+      challengeType: ChallengeType.SMOKING,
+    },
+  });
+
+  revalidatePath("/", "layout");
+  return checkIn;
+}
+
 export async function createOrUpdateCheckIn(
   data: CheckInTypeCombined & { userId: string }
 ) {
@@ -254,6 +307,19 @@ export async function getCheckIns(
 ) {
   if (type === ChallengeType.RUNNING) {
     return await prisma.checkInRunning.findMany({
+      where: {
+        userId: id,
+        createdAt: {
+          gte: intervalFrom,
+          lte: intervalTo,
+        },
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
+    });
+  } else if (type === ChallengeType.SMOKING) {
+    return await prisma.checkInSmoking.findMany({
       where: {
         userId: id,
         createdAt: {

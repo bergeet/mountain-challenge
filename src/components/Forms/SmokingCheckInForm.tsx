@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import {
-  createOrUpdateCheckInRunning,
+  createOrUpdateCheckInSmoking,
   createUserDetailCheckIn,
 } from "@/app/actions/checkins";
 import { Button } from "@/components/ui/button";
@@ -22,28 +22,34 @@ import { Separator } from "../ui/separator";
 
 const formSchema = z.object({
   walkingMinutes: z.number().int().min(0).optional().default(0),
-  minutes: z.number().int().min(0).optional().default(0),
-  km: z.number().int().min(0).optional().default(0),
+  smoked: z.number().int().min(0).optional().default(0),
   createdAt: z.date(),
 });
 
-interface RunningCheckInFormProps {
+interface SmokingCheckInFormProps {
   onCheckIn: () => void;
   userId: string;
 }
 
-export function RunningCheckInForm({
+interface UserDetailCheckIn {
+  userId: string;
+  createdAt: Date;
+  tenKmPace: number | null;
+  weight: number | null;
+  smokedCigarettes: number;
+}
+
+export function SmokingCheckInForm({
   onCheckIn,
   userId,
-}: RunningCheckInFormProps) {
+}: SmokingCheckInFormProps) {
   const [loading, setLoading] = useState(false);
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       walkingMinutes: 0,
-      minutes: 0,
-      km: 0,
+      smoked: 0,
       createdAt: new Date(),
     },
   });
@@ -51,31 +57,35 @@ export function RunningCheckInForm({
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
-    await createOrUpdateCheckInRunning({
+    await createOrUpdateCheckInSmoking({
       userId: userId,
-      challengeType: "RUNNING",
       walkingMinutes: values.walkingMinutes,
-      km: values.km,
-      minutes: values.minutes,
+      smokedCigarettes: values.smoked,
       createdAt: values.createdAt,
       updatedAt: new Date(),
-      checkPointMileMinutes: null,
+      challengeType: "SMOKING",
     })
       .then(() => {
-        setLoading(false);
+        createUserDetailCheckIn({
+          userId: userId,
+          createdAt: values.createdAt,
+          tenKmPace: null,
+          weight: null,
+          smokedCigarettes: values.smoked,
+        } as UserDetailCheckIn);
         onCheckIn();
       })
       .catch(() => {
         setLoading(false);
       });
 
-    if (values.km >= 10) {
+    if (values.smoked < 10) {
       createUserDetailCheckIn({
         userId: userId,
         createdAt: values.createdAt,
-        tenKmPace: values.minutes / values.km,
+        tenKmPace: null,
         weight: null,
-        smokedCigarettes: null,
+        smokedCigarettes: values.smoked,
       });
     }
   }
@@ -132,9 +142,9 @@ export function RunningCheckInForm({
         <div className="flex flex-row space-x-4">
           <FormField
             control={form.control}
-            name="minutes"
+            name="smoked"
             render={({ field }) => (
-              <FormItem className="flex flex-col-reverse items-start space-x-3 space-y-0 rounded-md border p-4 gap-4">
+              <FormItem className="flex flex-col-reverse items-start space-x-3 space-y-0 rounded-md border p-4 gap-4 w-full">
                 <FormControl>
                   <Input
                     {...field}
@@ -149,32 +159,7 @@ export function RunningCheckInForm({
                   />
                 </FormControl>
                 <div className="flex flex-col space-y-1"></div>
-                <FormLabel>Löptid i min</FormLabel>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="km"
-            render={({ field }) => (
-              <FormItem className="flex flex-col-reverse items-start space-x-3 space-y-0 rounded-md border p-4 gap-4">
-                <FormControl>
-                  <Input
-                    {...field}
-                    onChange={(v) =>
-                      field.onChange(
-                        v.target.value.trim() === "" ||
-                          isNaN(Number(v.target.value))
-                          ? ""
-                          : parseFloat(v.target.value)
-                      )
-                    }
-                  />
-                </FormControl>
-                <div className="flex flex-col space-y-1">
-                  <FormLabel>Längd in km</FormLabel>
-                </div>
+                <FormLabel>Cigg rökta</FormLabel>
                 <FormMessage />
               </FormItem>
             )}

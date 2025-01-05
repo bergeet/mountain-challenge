@@ -30,6 +30,11 @@ const tableConfigurations: Record<
     { label: "Åt snacks", attribute: "ateSugar" },
     { label: "Tid promenad", attribute: "walkingMinutes" },
   ],
+  SMOKING: [
+    { label: "Skapades", attribute: "createdAt" },
+    { label: "Rökte", attribute: "smokedCigarettes" },
+    { label: "Tid promenad", attribute: "walkingMinutes" },
+  ]
 };
 
 interface WeeklyViewProps {

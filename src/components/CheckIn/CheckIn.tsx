@@ -2,7 +2,7 @@
 
 import { useToast } from "@/hooks/use-toast";
 import { playConfetti } from "@/lib/utils";
-import { User } from "@prisma/client";
+import { ChallengeType, User } from "@prisma/client";
 import { useState } from "react";
 import { RunningCheckInForm } from "../Forms/RunningCheckInForm";
 import { WeightLossCheckIn } from "../Forms/WeightLossCheckIn";
@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
+import { SmokingCheckInForm } from "../Forms/SmokingCheckInForm";
 
 interface CheckInProps {
   user: User;
@@ -46,6 +47,8 @@ export function CheckIn({ user, onCheckIn }: CheckInProps) {
       return (
         <RunningCheckInForm onCheckIn={onCheckInHandler} userId={user.id} />
       );
+    } else if (user.challengeType === ChallengeType.SMOKING) {
+      return <SmokingCheckInForm onCheckIn={onCheckInHandler} userId={user.id} />
     } else {
       return (
         <WeightLossCheckIn onCheckIn={onCheckInHandler} userId={user.id} />
@@ -60,7 +63,7 @@ export function CheckIn({ user, onCheckIn }: CheckInProps) {
       <DialogTrigger onClick={() => setShowCheckInDialog(true)}>
         <h1 className="w-full">Checka in</h1>
       </DialogTrigger>
-      <DialogContent className="bg-gray-900/70">
+      <DialogContent className="bg-gray-900/70 overflow-scroll max-h-screen">
         <DialogHeader>
           <DialogTitle>Checka in</DialogTitle>
           <DialogDescription>

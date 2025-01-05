@@ -17,6 +17,7 @@ datasource db {
 enum ChallengeType {
   RUNNING
   WEIGHTLOSS
+  SMOKING
 }
 
 model User {
@@ -30,6 +31,7 @@ model User {
   challengeId       String?
   UserDetails       UserDetails[]
   Achievement       Achievement[]
+  CheckInSmoking    CheckInSmoking[]
 }
 
 model CheckInRunning {
@@ -64,6 +66,19 @@ model CheckInWeightLoss {
   @@unique([userId, createdAt])
 }
 
+model CheckInSmoking {
+  id               String        @id @default(cuid())
+  userId           String
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  user             User          @relation(fields: [userId], references: [id])
+  smokedCigarettes Int
+  walkingMinutes    Int
+  challengeType    ChallengeType
+
+  @@unique([userId, createdAt])
+}
+
 model Challenge {
   id          String        @id @default(cuid())
   name        String
@@ -81,6 +96,7 @@ model UserDetails {
   tenKmPace Float?
   weight    Float?
   createdAt DateTime @default(now())
+  smokedCigarettes Int?
 }
 
 model AchievementType {
