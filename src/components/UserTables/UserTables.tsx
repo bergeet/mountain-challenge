@@ -147,8 +147,8 @@ export function UserTables({ user }: UserTablesProps) {
     <div className="flex flex-col gap-8 w-full mx-auto">
       <Card className="border-gray-800 bg-gray-900/50 text-white shadow-lg">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold flex items-center gap-2">
-            <Calendar className="w-6 h-6" />
+          <CardTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+            <Calendar className="w-5 h-5 sm:w-6 sm:h-6" />
             {user.name}
           </CardTitle>
         </CardHeader>
@@ -162,14 +162,19 @@ export function UserTables({ user }: UserTablesProps) {
                 onValueChange={(value: string) =>
                   setResolutionAndInterval(value as "isoWeek" | "month")
                 }
+                className="w-full sm:w-auto"
               >
-                <TabsList>
-                  <TabsTrigger value="isoWeek">Vecka</TabsTrigger>
-                  <TabsTrigger value="month">Månad</TabsTrigger>
+                <TabsList className="w-full sm:w-auto">
+                  <TabsTrigger value="isoWeek" className="flex-1 sm:flex-none">
+                    Vecka
+                  </TabsTrigger>
+                  <TabsTrigger value="month" className="flex-1 sm:flex-none">
+                    Månad
+                  </TabsTrigger>
                 </TabsList>
               </Tabs>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
                 <Button
                   variant="outline"
                   size="icon"
@@ -177,7 +182,7 @@ export function UserTables({ user }: UserTablesProps) {
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
-                <span className="min-w-[8rem] text-center font-medium bg-gray-800 rounded-md py-2 px-3">
+                <span className="min-w-[8rem] text-center font-medium bg-gray-800 rounded-md py-2 px-3 text-sm sm:text-base">
                   {resolution === "isoWeek"
                     ? `Vecka ${intervalDates.startDate.isoWeek()}`
                     : intervalDates.startDate.toDate().toLocaleString("sv-SE", {
@@ -194,19 +199,21 @@ export function UserTables({ user }: UserTablesProps) {
                 </Button>
               </div>
             </div>
-            {resolution === "isoWeek" ? (
-              <WeeklyView
-                user={user}
-                checkIn={checkins}
-                removeRow={removeRow}
-              />
-            ) : (
-              <MonthlyView
-                user={user}
-                data={monthlyData()}
-                removeRow={removeRow}
-              />
-            )}
+            <div className="overflow-x-auto">
+              {resolution === "isoWeek" ? (
+                <WeeklyView
+                  user={user}
+                  checkIn={checkins}
+                  removeRow={removeRow}
+                />
+              ) : (
+                <MonthlyView
+                  user={user}
+                  data={monthlyData()}
+                  removeRow={removeRow}
+                />
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>

@@ -34,7 +34,7 @@ const tableConfigurations: Record<
     { label: "Skapades", attribute: "createdAt" },
     { label: "Rökte", attribute: "smokedCigarettes" },
     { label: "Tid promenad", attribute: "walkingMinutes" },
-  ]
+  ],
 };
 
 interface WeeklyViewProps {
@@ -50,7 +50,7 @@ export function WeeklyView({ user, checkIn, removeRow }: WeeklyViewProps) {
     <CardContent className="p-0">
       <div className="overflow-x-auto">
         <Table>
-          <TableHeader>
+          <TableHeader className="hidden md:table-header-group">
             <TableRow>
               <TableHead className="w-[50px]">Godkänd</TableHead>
               {columns.map((column) => (
@@ -65,17 +65,26 @@ export function WeeklyView({ user, checkIn, removeRow }: WeeklyViewProps) {
             {checkIn?.map((checkInItem) => (
               <TableRow
                 key={checkInItem.id}
-                className={`transition-colors hover:bg-gray-100 hover:text-black`}
+                className="flex flex-col mb-4 border-b md:table-row md:mb-0"
               >
-                <TableCell>
-                 {checkInItem.ateSugar ? <BadgeX className="text-red-400" /> :  <BadgeCheck className="text-green-400"/>}
+                <TableCell className="flex justify-between items-center py-2 md:table-cell">
+                  <span className="md:hidden font-bold">Godkänd:</span>
+                  {checkInItem.ateSugar ? (
+                    <BadgeX className="text-red-400" />
+                  ) : (
+                    <BadgeCheck className="text-green-400" />
+                  )}
                 </TableCell>
                 {columns.map((col) => (
-                  <TableCell key={col.attribute} className="text-right">
+                  <TableCell
+                    key={col.attribute}
+                    className="flex justify-between items-center py-2 md:table-cell md:text-right"
+                  >
+                    <span className="md:hidden font-bold">{col.label}:</span>
                     {getAttributesTypes(checkInItem[col.attribute])}
                   </TableCell>
                 ))}
-                <TableCell>
+                <TableCell className="flex justify-end py-2 md:table-cell">
                   <Button
                     variant="ghost"
                     size="icon"
