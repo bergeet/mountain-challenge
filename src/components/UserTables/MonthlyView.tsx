@@ -1,6 +1,12 @@
 import { ChallengeType, User } from "@prisma/client";
 import dayjs from "dayjs";
-import { BadgeCheck, BadgeX, CircleCheckBig, CircleSlash, Trash2 } from 'lucide-react';
+import {
+  BadgeCheck,
+  BadgeX,
+  CircleCheckBig,
+  CircleSlash,
+  Trash2,
+} from "lucide-react";
 import { Button } from "../ui/button";
 import { CardContent } from "../ui/card";
 import {
@@ -25,6 +31,10 @@ const tableConfigurations: Record<
     { label: "Godkänd dag", attribute: "valid" },
   ],
   SMOKING: [
+    { label: "Dag", attribute: "day" },
+    { label: "Godkänd dag", attribute: "valid" },
+  ],
+  GYM: [
     { label: "Dag", attribute: "day" },
     { label: "Godkänd dag", attribute: "valid" },
   ],
@@ -92,7 +102,9 @@ export function MonthlyView({ user, data, removeRow }: MonthlyViewProps) {
                         {day.day.format("YYYY-MM-DD")}
                       </TableCell>
                       <TableCell className="flex justify-between items-center py-2 md:table-cell">
-                        <span className="md:hidden font-bold">Godkänd dag:</span>
+                        <span className="md:hidden font-bold">
+                          Godkänd dag:
+                        </span>
                         {day.valid ? (
                           <BadgeCheck className="text-green-400 h-5 w-5" />
                         ) : (

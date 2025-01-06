@@ -16,6 +16,7 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { SmokingCheckInForm } from "../Forms/SmokingCheckInForm";
+import { GymCheckInForm } from "../Forms/GymCheckInForm";
 
 interface CheckInProps {
   user: User;
@@ -48,7 +49,11 @@ export function CheckIn({ user, onCheckIn }: CheckInProps) {
         <RunningCheckInForm onCheckIn={onCheckInHandler} userId={user.id} />
       );
     } else if (user.challengeType === ChallengeType.SMOKING) {
-      return <SmokingCheckInForm onCheckIn={onCheckInHandler} userId={user.id} />
+      return (
+        <SmokingCheckInForm onCheckIn={onCheckInHandler} userId={user.id} />
+      );
+    } else if (user.challengeType === ChallengeType.GYM) {
+      return <GymCheckInForm onCheckIn={onCheckInHandler} userId={user.id} />;
     } else {
       return (
         <WeightLossCheckIn onCheckIn={onCheckInHandler} userId={user.id} />

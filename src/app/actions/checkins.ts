@@ -7,6 +7,7 @@ import {
   CheckInRunning,
   CheckInSmoking,
   CheckInWeightLoss,
+  CheckInGym,
   UserDetails,
 } from "@prisma/client";
 import dayjs from "dayjs";
@@ -211,6 +212,58 @@ export async function createOrUpdateCheckInSmoking(
   return checkIn;
 }
 
+export async function createOrUpdateCheckInGym(
+  data: Omit<CheckInGym, "id"> & { userId: string }
+) {
+  const { walkingMinutes, wentToGym, createdAt, userId } = data;
+
+  const user = await prisma.user.findFirst({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const existingCheckin = await prisma.checkInGym.findFirst({
+    where: {
+      userId: user.id,
+      createdAt: {
+        gte: dayjs(createdAt).startOf("day").toDate(),
+        lte: dayjs(createdAt).endOf("day").toDate(),
+      },
+    },
+  });
+
+  if (existingCheckin) {
+    throw new Error("Checkin already exists");
+  }
+
+  const checkIn = await prisma.checkInGym.upsert({
+    where: {
+      userId_createdAt: {
+        userId: user.id,
+        createdAt,
+      },
+    },
+    update: {
+      walkingMinutes,
+      wentToGym,
+      challengeType: ChallengeType.GYM,
+    },
+    create: {
+      createdAt,
+      user: { connect: { id: user.id } },
+      walkingMinutes,
+      wentToGym,
+      challengeType: ChallengeType.GYM,
+    },
+  });
+
+  revalidatePath("/", "layout");
+  return checkIn;
+}
+
 export async function createOrUpdateCheckIn(
   data: CheckInTypeCombined & { userId: string }
 ) {
@@ -294,6 +347,10 @@ export async function deleteCheckIn(id: string, type: ChallengeType) {
     await prisma.checkInRunning.delete({ where: { id } });
   } else if (type === ChallengeType.WEIGHTLOSS) {
     await prisma.checkInWeightLoss.delete({ where: { id } });
+  } else if (type === ChallengeType.SMOKING) {
+    await prisma.checkInSmoking.delete({ where: { id } });
+  } else if (type === ChallengeType.GYM) {
+    await prisma.checkInGym.delete({ where: { id } });
   }
 
   revalidatePath("/", "layout");
@@ -333,6 +390,19 @@ export async function getCheckIns(
     });
   } else if (type === ChallengeType.WEIGHTLOSS) {
     return await prisma.checkInWeightLoss.findMany({
+      where: {
+        userId: id,
+        createdAt: {
+          gte: intervalFrom,
+          lte: intervalTo,
+        },
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
+    });
+  } else if (type === ChallengeType.GYM) {
+    return await prisma.checkInGym.findMany({
       where: {
         userId: id,
         createdAt: {

@@ -6,6 +6,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import dayjs from "@/lib/dayjs-configurations";
 import {
   ChallengeType,
+  CheckInGym,
   CheckInRunning,
   CheckInSmoking,
   CheckInWeightLoss,
@@ -26,7 +27,8 @@ import { WeeklyView } from "./WeeklyView";
 
 export type CheckInTypeCombined = CheckInRunning &
   CheckInWeightLoss &
-  CheckInSmoking;
+  CheckInSmoking &
+  CheckInGym;
 
 interface UserTablesProps {
   user: User;

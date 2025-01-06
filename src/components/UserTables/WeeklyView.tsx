@@ -35,6 +35,12 @@ const tableConfigurations: Record<
     { label: "Rökte", attribute: "smokedCigarettes" },
     { label: "Tid promenad", attribute: "walkingMinutes" },
   ],
+  GYM: [
+    { label: "Skapades", attribute: "createdAt" },
+    { label: "Gick till gymmet", attribute: "wentToGym" },
+    { label: "Tid promenad", attribute: "walkingMinutes" },
+  ]
+
 };
 
 interface WeeklyViewProps {
