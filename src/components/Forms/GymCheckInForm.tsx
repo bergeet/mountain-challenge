@@ -17,6 +17,7 @@ import { useState } from "react";
 import { Calendar } from "../ui/calendar";
 import { Separator } from "../ui/separator";
 import { Checkbox } from "../ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   walkingMinutes: z.number().int().min(0).optional().default(0),
@@ -31,6 +32,8 @@ interface GymCheckInFormProps {
 
 export function GymCheckInForm({ onCheckIn, userId }: GymCheckInFormProps) {
   const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,21 +47,37 @@ export function GymCheckInForm({ onCheckIn, userId }: GymCheckInFormProps) {
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
-    await createOrUpdateCheckInGym({
-      userId: userId,
-      walkingMinutes: values.walkingMinutes,
-      wentToGym: values.wentToGym,
-      createdAt: values.createdAt,
-      updatedAt: new Date(),
-      challengeType: "GYM",
-    })
-      .then(() => {
-        setLoading(false);
-        onCheckIn();
+    try {
+      await createOrUpdateCheckInGym({
+        userId: userId,
+        walkingMinutes: values.walkingMinutes,
+        wentToGym: values.wentToGym,
+        createdAt: values.createdAt,
+        updatedAt: new Date(),
+        challengeType: "GYM",
       })
-      .catch(() => {
-        setLoading(false);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .then((message: any) => {
+          if (message.success === false) {
+            toast({
+              title: "Error",
+              description: message.message,
+              variant: "destructive",
+            });
+            setLoading(false);
+            return;
+          }
+          setLoading(false);
+          onCheckIn();
+        })
+      
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error as string,
+        variant: "destructive",
       });
+    }
   }
 
   return (

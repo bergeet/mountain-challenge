@@ -108,6 +108,16 @@ export function UserTables({ user }: UserTablesProps) {
         0
       );
 
+      const gymCheckinsThisWeek = checkins.reduce(
+        (acc, curr) =>
+          dayjs(curr.createdAt).isoWeek() === weekNumber && curr.wentToGym
+            ? acc + 1
+            : acc,
+        0
+      );
+
+      console.log(gymCheckinsThisWeek)
+
       const dayIsValid =
         checkIn.ateSugar !== undefined || checkIn.ateSugar !== null
           ? !checkIn.ateSugar
@@ -115,7 +125,7 @@ export function UserTables({ user }: UserTablesProps) {
 
       const weekIsvalid =
         walkingMinutesPerWeek >= 180 &&
-        (!checkIn.ateSugar || runningKmPerWeek > 15);
+        (!checkIn.ateSugar || runningKmPerWeek > 15 || gymCheckinsThisWeek > 3);
       const id = checkIn.id;
 
       if (weekIndex === -1) {

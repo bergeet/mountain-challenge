@@ -236,7 +236,7 @@ export async function createOrUpdateCheckInGym(
   });
 
   if (existingCheckin) {
-    throw new Error("Checkin already exists");
+    return { success: false, message: "Checkin already exists" };
   }
 
   const checkIn = await prisma.checkInGym.upsert({
