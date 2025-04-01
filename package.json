@@ -2,12 +2,22 @@
   "name": "mountain-challenge",
   "version": "0.1.0",
   "private": true,
+  "build": {
+    "env": {
+      "NODE_VERSION": "20"
+    }
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "vercel-build": "prisma generate && prisma migrate deploy && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "npm rebuild sqlite3 --build-from-source=false"
+
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
